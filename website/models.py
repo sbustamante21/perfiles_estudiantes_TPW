@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 # Create your models here.
 
-class Roles(models.Model):
+class Role(models.Model):
     name = models.CharField(max_length=20)
 
     def __str__(self):
@@ -13,7 +13,7 @@ class Roles(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role_id = models.ForeignKey(Roles, on_delete=models.CASCADE, null=True)
+    role_id = models.ForeignKey(Role, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.user.email
