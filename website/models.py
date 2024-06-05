@@ -60,7 +60,7 @@ class CurriculumPlan(models.Model):
         return f"{self.name}-{self.degree_id.name}"
 
 class Subject(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
     period = models.IntegerField()
     period_type = models.ForeignKey(PeriodType, on_delete=models.CASCADE)
     plan_id = models.ForeignKey(CurriculumPlan, on_delete=models.CASCADE)
