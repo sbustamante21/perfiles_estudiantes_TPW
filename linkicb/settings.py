@@ -74,6 +74,16 @@ WSGI_APPLICATION = 'linkicb.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# Login & Logout URLs
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/home/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+# TEMPLATES = [
+# { 
+#   'DIRS': [os.path.join(BASE_DIR, 'templates/')]}
+# ]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
