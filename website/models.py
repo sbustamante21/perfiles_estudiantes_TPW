@@ -70,12 +70,12 @@ class Subject(models.Model):
 
 class Student(models.Model):
     admission_year = models.IntegerField()
-    personal_mail = models.EmailField()
-    phone_number = models.IntegerField()
-    pfp = models.ImageField()
+    personal_mail = models.EmailField(unique=True, blank=True, null=True)
+    phone_number = models.IntegerField(unique=True, blank=True, null=True)
+    pfp = models.ImageField(null=True)
     user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    curriculum_plan_id = models.ForeignKey(CurriculumPlan, on_delete=models.CASCADE)
     degree_id = models.ForeignKey(Degree, on_delete=models.CASCADE)
+    curriculum_plan_id = models.ForeignKey(CurriculumPlan, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user_id.user.email
@@ -86,8 +86,8 @@ class Interest(models.Model):
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
 
 class History(models.Model):
-    year = models.IntegerField()
-    period = models.IntegerField()
+    year = models.IntegerField(null=False, blank=False)
+    period = models.IntegerField(null=False, blank=False)
     interest_type_id = models.ForeignKey(InterestType, on_delete=models.CASCADE)
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)

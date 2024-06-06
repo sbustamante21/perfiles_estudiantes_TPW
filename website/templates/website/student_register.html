@@ -1,49 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form method="POST" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-    <h2>Registro</h2>
-
-    {% for field in user_form %}
-    <p>
-        {% if field.errors %}
-    <ul class="errorlist">
-        {% for error in field.errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {{ field.label_tag }} {{ field }}
-    </p>
-    {% endfor %}
-
-    {% for field in profile_form %}
-    <p>
-        {% if field.errors %}
-    <ul class="errorlist">
-        {% for error in field.errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {{ field.label_tag }} {{ field }}
-    </p>
-    {% endfor %}
-
-    {% for field in student_form %}
-    <p>
-        {% if field.errors %}
-    <ul class="errorlist">
-        {% for error in field.errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {{ field.label_tag }} {{ field }}
-    </p>
-    {% endfor %}
-
-    <input type="submit" value="Register" />
-</form>
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="POST" enctype="multipart/form-data" novalidate class="needs-validation">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Registro de Estudiante</h3>
+                    </div>
+                    <div class="card-body">
+                        {% csrf_token %}
+                        {% for field in user_form %}
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label">{{ field.label_tag }} {{ field }}</label>
+                            <div class="col-sm-9">
+                                {% if field.errors %}
+                                <ul class="errorlist">
+                                    {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% for field in student_form %}
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label">{{ field.label_tag }} {{ field }}</label>
+                            <div class="col-sm-9">
+                                {% if field.errors %}
+                                <ul class="errorlist">
+                                    {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="class-footer pb-2 px-2">
+                        <div class="row">
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">Registrarse</button>
+                            </div>
+                        </div>
+                        <!-- <input type="submit" value="Registrarse" /> -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}
