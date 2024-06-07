@@ -43,15 +43,11 @@ class StudentRegisterForm(forms.ModelForm):
         model = Student
         fields = ['admission_year', 'personal_mail', 'phone_number', 'pfp', 'degree_id', 'curriculum_plan_id',]
         exclude = ["pfp"]
-        labels = {
-            'admission_year': _('Año de admisión'),
-            'personal_mail': _('Correo personal'),
-            'phone_number': _('Número de teléfono'),
-            'pfp': _('Foto de perfil'),
-            'curriculum_plan_id': _('Plan de estudios'),
-            'degree_id': _('Título'),
-        }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["curriculum_plan_id"].queryset = CurriculumPlan.objects.none()
+        
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)
     phone_number = forms.IntegerField(required=False)

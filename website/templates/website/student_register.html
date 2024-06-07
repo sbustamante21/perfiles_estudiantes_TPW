@@ -35,7 +35,7 @@
                             {% elif field.name == 'phone_number' %}
                             <input type="number" name="{{ field.html_name }}" class="form-control" />
                             {% elif field.name == 'degree_id' or field.name == 'curriculum_plan_id' %}
-                            <select name="{{ field.id }}" class="form-control">
+                            <select name="{{ field.name }}" class="form-control">
                                 {% for choice in field.field.choices %}
                                 <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                                 {% endfor %}
@@ -64,4 +64,5 @@
         </div>
     </div>
 </div>
+
 {% endblock content %}

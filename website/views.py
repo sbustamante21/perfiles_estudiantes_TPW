@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView
+from django.http import JsonResponse
 from .forms import StudentRegisterForm, UserRegisterForm, ProfileRegisterForm
-from .models import Student, Role, Profile
+from .models import Student, Role, Profile, CurriculumPlan
 
 
 # Create your views here.
@@ -22,7 +24,6 @@ def student_register(request):
             profile = profile_form.save(commit=False)
             profile.user = user
 
-            # Set the role_id value (assumes you have a default Role object you want to use)
             default_role = Role.objects.get(name='ESTUDIANTE')  # Change 'Student' to the appropriate role name
             profile.role_id = default_role
             profile.save()
@@ -34,11 +35,6 @@ def student_register(request):
             # Redirect to the login page
             return redirect(reverse('login'))
 
-            # Authenticate and log the user in
-            # new_user = authenticate(username=user_form.cleaned_data['username'], password=user_form.cleaned_data['password'])
-            # login(request, new_user)
-            
-            # return redirect('home')
     else:
         user_form = UserRegisterForm()
         profile_form = ProfileRegisterForm()
