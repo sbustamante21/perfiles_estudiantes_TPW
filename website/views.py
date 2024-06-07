@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
 from .forms import StudentRegisterForm, UserRegisterForm, ProfileRegisterForm
 from .models import Student, Role, Profile, CurriculumPlan
+from django.contrib.auth.views import LogoutView
+from django.urls import reverse_lazy
 
 
 # Create your views here.
