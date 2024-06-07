@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "website",
     "smart_selects",
+    "bootstrap5",
 ]
 
 MIDDLEWARE = [

@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, reverse
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
@@ -15,26 +16,44 @@ from django.contrib.auth.views import LogoutView
 
 # Views
 @login_required
-def home(request):
-    return render(request, "website/success.html", {})
+def main_page(request):
+    return render(request, "website/main_page.html", {})
+
+
+def do_login(request):
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = auth.authenticate(username=username, password=password)
+
+            if user is not None:
+                auth.login(request, user)
+                return redirect(reverse("main_page"))
+            else:
+                messages.info(request, "Invalid credentials")
+                return redirect(reverse("login"))
+        else:
+            messages.error(request, "Error processing your request")
+            return render(request, "website/login.html", {"form": form})
+    else:
+        form = AuthenticationForm()
+        return render(request, "website/login.html", {"form": form})
 
 
 def do_logout(request):
     if request.user.is_authenticated:
         logout(request)
-    return redirect("inicio")
+    return redirect("welcome")
 
 
 class CustomLoginView(auth_views.LoginView):
     template_name = "website/login.html"
 
 
-def inicio(request):
-    return render(request, "website/inicio.html")
-
-
-def login(request):
-    return render(request, "website/login.html")
+def welcome(request):
+    return render(request, "website/welcome.html")
 
 
 def register(request):
