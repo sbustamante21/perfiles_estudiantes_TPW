@@ -11,18 +11,13 @@ def home(request):
 
 class CustomLoginView(auth_views.LoginView):
     template_name = 'website/login.html'
- 
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username = username, password = password)
-            login(request, user)
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'register.html', {'form': form})
+
 # Create your views here.
+def inicio(request):
+    return render(request, 'website/inicio.html')
+
+def login(request):
+    return render(request, 'website/login.html')
+
+def register(request):
+    return render(request, 'website/register.html')
