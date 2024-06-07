@@ -30,7 +30,9 @@ def do_login(request):
 
             if user is not None:
                 auth.login(request, user)
-                return redirect(reverse("main_page"))
+                return redirect(
+                    reverse("main_page")
+                )  # aca condicionar segun el rol de usuario
             else:
                 messages.info(request, "Invalid credentials")
                 return redirect(reverse("login"))
