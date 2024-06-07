@@ -1,8 +1,16 @@
 from django.shortcuts import render, redirect, reverse
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse, reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView
+from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
+from .forms import StudentRegisterForm, UserRegisterForm, ProfileRegisterForm
+from .models import Student, Role, Profile, CurriculumPlan
+
+
+# Create your views here.
 
 # Views
 @login_required
@@ -12,7 +20,6 @@ def home(request):
 class CustomLoginView(auth_views.LoginView):
     template_name = 'website/login.html'
 
-# Create your views here.
 def inicio(request):
     return render(request, 'website/inicio.html')
 
@@ -21,3 +28,68 @@ def login(request):
 
 def register(request):
     return render(request, 'website/register.html')
+
+def student_register(request):
+    if request.method == 'POST':
+        user_form = UserRegisterForm(request.POST)
+        profile_form = ProfileRegisterForm(request.POST)
+        student_form = StudentRegisterForm(request.POST, request.FILES)
+        
+        if user_form.is_valid() and profile_form.is_valid() and student_form.is_valid():
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+            
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            default_role = Role.objects.get(name='ESTUDIANTE')  # Change 'Student' to the appropriate role name
+            profile.role_id = default_role
+            profile.save()
+            
+            student = student_form.save(commit=False)
+            student.user_id = profile
+            student.save()
+            
+            # Redirect to the login page
+            return redirect(reverse('login'))
+
+    else:
+        user_form = UserRegisterForm()
+        profile_form = ProfileRegisterForm()
+        student_form = StudentRegisterForm()
+        
+    return render(request, 'website/student_register.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'student_form': student_form
+    })
+
+def professor_register(request):
+    if request.method == 'POST':
+        user_form = UserRegisterForm(request.POST)
+        profile_form = ProfileRegisterForm(request.POST)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+            
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            professor_role = Role.objects.get(name='DOCENTE')
+            profile.role_id = professor_role
+            profile.save()
+            
+            return redirect(reverse('login'))
+    else:
+        user_form = UserRegisterForm()
+        profile_form = ProfileRegisterForm()
+        
+    return render(request, 'website/professor_register.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })
+
+def login(request):
+    return render(request, 'website/login.html')

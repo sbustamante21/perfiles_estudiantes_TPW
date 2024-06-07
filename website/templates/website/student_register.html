@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form method="POST" enctype="multipart/form-data" novalidate class="needs-validation">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Registro de Estudiante</h3>
+                    </div>
+                    <div class="card-body">
+                        {% csrf_token %}
+                        {% for field in user_form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <input type="{% if 'password' in field.label_tag %}password{% else %}text{% endif %}"
+                                name="{{ field.html_name }}" class="form-control"
+                                maxlength="{% if 'username' in field.label_tag %}150{% endif %}"
+                                id="{{ field.id_for_label }}" required />
+                        </div>
+                        {% if field.errors %} {% for error in field.errors %}
+                        <p style="font-size: 13px;">
+                            {{ error|escape }}
+                        </p>
+                        {% endfor %} {% endif %} {% endfor %}
+
+                        {% for field in student_form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% if field.name == 'admission_year' %}
+                            <input type="number" name="{{ field.html_name }}" class="form-control" required />
+                            {% elif field.name == 'personal_mail' %}
+                            <input type="email" name="{{ field.html_name }}" class="form-control" />
+                            {% elif field.name == 'phone_number' %}
+                            <input type="number" name="{{ field.html_name }}" class="form-control" />
+                            {% elif field.name == 'degree_id' or field.name == 'curriculum_plan_id' %}
+                            <select name="{{ field.name }}" class="form-control">
+                                {% for choice in field.field.choices %}
+                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                        </div>
+                        {% if field.errors %} {% for error in field.errors %}
+                        <p style="font-size: 13px;">
+                            {{ error|escape }}
+                        </p>
+                        {% endfor %} {% endif %} {% endfor %}
+                    </div>
+                    <div class="class-footer pb-2 px-2">
+                        <div class="row">
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">Registrarse</button>
+                            </div>
+                        </div>
+                        <!-- <input type="submit" value="Registrarse" /> -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
