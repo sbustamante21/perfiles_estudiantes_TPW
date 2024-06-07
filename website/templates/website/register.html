@@ -4,8 +4,8 @@
 <section class="mt-5 pt-5">
   <div class="container">
     <h2>Registrarse</h2>
-    <button onclick="showRegisterForm('student')" class="btn btn-primary">Registrarse como Estudiante</button>
-    <button onclick="showRegisterForm('teacher')" class="btn btn-secondary">Registrarse como Docente</button>
+    <a href="{% url 'student_register' %}" class="btn btn-primary">Registrarse como Estudiante</a>
+    <a href="{% url 'professor_register' %}" class="btn btn-secondary">Registrarse como Docente</a>
   </div>
 </section>
 
