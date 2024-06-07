@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "website",
+    "smart_selects",
 ]
 
 MIDDLEWARE = [
@@ -135,6 +136,9 @@ TIME_ZONE = "America/Santiago"
 USE_I18N = True
 
 USE_TZ = True
+
+JQUERY_URL = True
+USE_DJANGO_JQUERY = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

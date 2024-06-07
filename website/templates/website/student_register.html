@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -25,17 +26,18 @@
                         </p>
                         {% endfor %} {% endif %} {% endfor %}
 
+                        {{ student_form.media.js }}
                         {% for field in student_form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {% if field.name == 'admission_year' %}
-                            <input type="number" name="{{ field.html_name }}" class="form-control" required />
+                            <input type="number" name="{{ field.html_name }}" class="form-control" id="{{ field.id_for_label }}" required />
                             {% elif field.name == 'personal_mail' %}
-                            <input type="email" name="{{ field.html_name }}" class="form-control" />
+                            <input type="email" name="{{ field.html_name }}" class="form-control" id="{{ field.id_for_label }}" />
                             {% elif field.name == 'phone_number' %}
-                            <input type="number" name="{{ field.html_name }}" class="form-control" />
+                            <input type="number" name="{{ field.html_name }}" class="form-control" id="{{ field.id_for_label }}" />
                             {% elif field.name == 'degree_id' or field.name == 'curriculum_plan_id' %}
-                            <select name="{{ field.name }}" class="form-control">
+                            <select name="{{ field.name }}" class="form-control" id="{{ field.id_for_label }}">
                                 {% for choice in field.field.choices %}
                                 <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                                 {% endfor %}
@@ -64,5 +66,4 @@
         </div>
     </div>
 </div>
-
 {% endblock content %}
