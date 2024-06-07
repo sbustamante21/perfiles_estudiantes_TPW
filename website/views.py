@@ -1,14 +1,33 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
+from django.contrib.auth import views as auth_views
 from .forms import StudentRegisterForm, UserRegisterForm, ProfileRegisterForm
 from .models import Student, Role, Profile, CurriculumPlan
 
 
 # Create your views here.
+
+# Views
+@login_required
+def home(request):
+    return render(request, "website/success.html", {})
+
+class CustomLoginView(auth_views.LoginView):
+    template_name = 'website/login.html'
+
+def inicio(request):
+    return render(request, 'website/inicio.html')
+
+def login(request):
+    return render(request, 'website/login.html')
+
+def register(request):
+    return render(request, 'website/register.html')
 
 def student_register(request):
     if request.method == 'POST':
