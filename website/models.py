@@ -61,8 +61,8 @@ class Subject(models.Model):
 
 class Student(models.Model):
     admission_year = models.IntegerField()
-    personal_mail = models.EmailField(unique=True, blank=True, null=True)
-    phone_number = models.IntegerField(unique=True, blank=True, null=True)
+    personal_mail = models.EmailField(blank=True, null=True)
+    phone_number = models.IntegerField(blank=True, null=True)
     pfp = models.ImageField(null=True)
     user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
     degree_id = models.ForeignKey(Degree, on_delete=models.CASCADE)

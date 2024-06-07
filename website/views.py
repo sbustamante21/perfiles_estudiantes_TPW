@@ -19,6 +19,11 @@ from django.urls import reverse_lazy
 def home(request):
     return render(request, "website/success.html", {})
 
+def do_logout(request):
+    if request.user.is_authenticated:
+        logout(request) 
+    return redirect("inicio")
+
 class CustomLoginView(auth_views.LoginView):
     template_name = 'website/login.html'
 
@@ -39,7 +44,7 @@ def student_register(request):
         
         if user_form.is_valid() and profile_form.is_valid() and student_form.is_valid():
             user = user_form.save(commit=False)
-            user.set_password(user_form.cleaned_data['password'])
+            user.set_password(user_form.cleaned_data['password1'])
             user.save()
             
             profile = profile_form.save(commit=False)
@@ -54,7 +59,7 @@ def student_register(request):
             student.save()
             
             # Redirect to the login page
-            return redirect(reverse('login'))
+            return redirect(reverse('inicio'))
 
     else:
         user_form = UserRegisterForm()
@@ -74,7 +79,7 @@ def professor_register(request):
         
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save(commit=False)
-            user.set_password(user_form.cleaned_data['password'])
+            user.set_password(user_form.cleaned_data['password1'])
             user.save()
             
             profile = profile_form.save(commit=False)
@@ -83,7 +88,7 @@ def professor_register(request):
             profile.role_id = professor_role
             profile.save()
             
-            return redirect(reverse('login'))
+            return redirect(reverse('inicio'))
     else:
         user_form = UserRegisterForm()
         profile_form = ProfileRegisterForm()
