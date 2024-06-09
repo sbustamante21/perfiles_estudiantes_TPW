@@ -138,7 +138,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-JQUERY_URL = True
 USE_DJANGO_JQUERY = True
 
 # Static files (CSS, JavaScript, Images)
