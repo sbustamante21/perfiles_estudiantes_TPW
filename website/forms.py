@@ -1,7 +1,6 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Profile, Student, CurriculumPlan, Degree
+from .models import Student, CurriculumPlan, Degree, User
 from django.core.validators import MaxValueValidator
 import datetime
 
@@ -28,17 +27,7 @@ class UserRegisterForm(UserCreationForm):
 
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("This value already exists.")
-        if not email.endswith("@alumnos.utalca.cl") and not email.endswith(
-            "@utalca.cl"
-        ):
-            raise forms.ValidationError("You must use your institution's e-mail.")
         return email
-
-
-class ProfileRegisterForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        exclude = ["role_id", "user"]
 
 
 class StudentRegisterForm(forms.ModelForm):

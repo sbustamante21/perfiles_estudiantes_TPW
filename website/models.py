@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -8,20 +8,27 @@ from smart_selects.db_fields import ChainedForeignKey
 # Create your models here.
 
 
+class User(AbstractUser):
+    ADMIN = 0
+    PROFESSOR = 1
+    STUDENT = 2
+
+    ROLE_CHOICES = (
+        (PROFESSOR, "Professor"),
+        (STUDENT, "Student"),
+        (ADMIN, "Admin"),
+    )
+
+    role = models.IntegerField(choices=ROLE_CHOICES, default=0)
+
+    def __str__(self):
+        return self.username
+
 class Role(models.Model):
     name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
-
-
-class Profile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role_id = models.ForeignKey(Role, on_delete=models.CASCADE, null=True)
-
-    def __str__(self):
-        return self.user.email
-
 
 class PeriodType(models.Model):
     name = models.CharField(max_length=15)
@@ -41,10 +48,10 @@ class Contact(models.Model):
     message = models.CharField(max_length=500, default="SAMPLE MESSAGE")
     message_type_id = models.ForeignKey(InterestType, on_delete=models.CASCADE)
     receiver_id = models.ForeignKey(
-        Profile, related_name="receiver", on_delete=models.CASCADE
+        User, related_name="receiver", on_delete=models.CASCADE
     )
     sender_id = models.ForeignKey(
-        Profile, related_name="sender", on_delete=models.CASCADE
+        User, related_name="sender", on_delete=models.CASCADE
     )
 
 
@@ -79,7 +86,7 @@ class Student(models.Model):
     personal_mail = models.EmailField(blank=True, null=True)
     phone_number = models.IntegerField(blank=True, null=True)
     pfp = models.ImageField(null=True)
-    user_id = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     degree_id = models.ForeignKey(Degree, on_delete=models.CASCADE)
     curriculum_plan_id = ChainedForeignKey(
         CurriculumPlan,
@@ -91,7 +98,7 @@ class Student(models.Model):
     )
 
     def __str__(self):
-        return self.user_id.user.email
+        return self.user.email
 
 
 class Interest(models.Model):

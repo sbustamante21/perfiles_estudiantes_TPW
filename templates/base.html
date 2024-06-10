@@ -10,13 +10,29 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md bg-success fixed-top mb-5" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-md bg-success fixed-top mb-5 navbar-dark" data-bs-theme="dark">
         <div class="container-fluid bg-success">
-            <a class="navbar-brand bg-success text-white" href="{% url 'main_page' %}">
-                <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
-                    alt="logoicb">
-                <span class="bold-text">LINK ICB</span>
-            </a>
+            {% if request.user.is_authenticated%}
+                {%if request.user.role == "0"%}
+                    <a class="navbar-brand bg-success text-white" href="{% url 'admin_page' %}">
+                        <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
+                            alt="logoicb">
+                        <span class="bold-text">LINK ICB</span>
+                    </a>
+                {% else %}
+                <a class="navbar-brand bg-success text-white" href="{% url 'main_page' %}">
+                    <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
+                        alt="logoicb">
+                    <span class="bold-text">LINK ICB</span>
+                </a>
+                {% endif %}
+            {% else %}
+                <a class="navbar-brand bg-success text-white" href="{%url 'welcome'%}">
+                    <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
+                        alt="logoicb">
+                    <span class="bold-text">LINK ICB</span>
+                </a>
+            {% endif %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -24,20 +40,34 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                     
-                    {% if request.user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Mi Perfil</a>
-                    </li>
+                    {% if request.user.is_authenticated%}
+                        {% if request.user.role == "0" %}
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
+                        </li>
+                        {% elif request.user.role != "0" %}
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Mi perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
+                        </li>
+                        {% endif %}
+
+                    {%else%}
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
+                        </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
-                    </li>
                 </ul>
             </div>
         </div>
