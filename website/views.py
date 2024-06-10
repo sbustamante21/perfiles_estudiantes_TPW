@@ -51,6 +51,20 @@ def do_login(request):
         form = AuthenticationForm()
         return render(request, "website/login.html", {"form": form})
 
+@login_required
+def profile_page(request):
+
+    user = request.user
+    if user.role == user.STUDENT:
+        degree = user.student.degree_id
+        adm_year = user.student.admission_year
+        pfp = user.student.pfp
+        context = {"user": user, "role": "Estudiante", "degree":degree, "year":adm_year, "pfp":pfp}
+    elif user.role == user.PROFESSOR:
+        context = {"user":user, "role":"Docente"}
+
+    return render(request, "website/profile_page.html", context)
+
 
 def do_logout(request):
     if request.user.is_authenticated:
