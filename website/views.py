@@ -53,7 +53,6 @@ def do_login(request):
 
 @login_required
 def profile_page(request):
-
     user = request.user
     if user.role == user.STUDENT:
         degree = user.student.degree_id

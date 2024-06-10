@@ -28,17 +28,19 @@
                 <p class="text-muted mb-1">{{role}} en</p>
               {% endif %}
               <p class="text-muted mb-4">Universidad de Talca</p>
+              {% if role == "Estudiante" %}
               <div class="d-flex justify-content-center mb-2">
                 <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
               </div>
+              {% endif %}
             </div>
           </div>
           {% if role == "Estudiante" %}
             <div class="card mb-4 mb-lg-0">
                 <div class="card-body p-0">
-                <ul class="list-group list-group-flush rounded-3">
-                    {% comment %} aqui ir colocando las cosas del historial en un ciclo for {% endcomment %}
-                </ul>
+                    <ul class="list-group list-group-flush rounded-3">
+                        {% comment %} aqui ir colocando las cosas del historial en un ciclo for {% endcomment %}
+                    </ul>
                 </div>
             </div>
           {% endif %}
@@ -91,6 +93,7 @@
                   <p class="text-muted mb-0">{{year}}</p>
                 </div>
               </div>
+              <hr>
               <div class="row">
                 <div class="col-sm-3">
                   <p class="mb-0">Carrera</p>
@@ -107,7 +110,7 @@
             <div class="col-md-4">
                 <div class="card mb-4 mb-md-0">
                     <div class="card-body">
-                        <p class="mb-4"> TUTORIA DE </p>
+                        <p class="mb-4"> OFREZCO TUTORIA DE </p>
                         <ul>
                             {% comment %} En ciclo, colocar las ayudantias de interes {% endcomment %}
                         </ul>
@@ -117,7 +120,7 @@
             <div class="col-md-4">
                 <div class="card mb-4 mb-md-0">
                   <div class="card-body">
-                      <p class="mb-4">AYUDANTIA DE</p>
+                      <p class="mb-4">OFREZCO AYUDANTIA DE</p>
                       <ul>
                           {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
                       </ul>
@@ -127,7 +130,7 @@
           <div class="col-md-4">
             <div class="card mb-4 mb-md-0">
               <div class="card-body">
-                  <p class="mb-4">AUXILIO</p>
+                  <p class="mb-4">NECESITO AUXILIO EN</p>
                   <ul>
                       {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
                   </ul>
