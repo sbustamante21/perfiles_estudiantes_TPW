@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+
+
+<div class="container mt-5 pt-5">
+    <h3>hola, {{user.username}} has iniciado como {{role}}</h1>
+</div>
+
+<section style="background-color: #eee;">
+    <div class="container py-5">
+  
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card mb-4">
+            <div class="card-body text-center">
+                {% if role == "Estudiante" and pfp %}
+                    <img src={{ pfp.url }} alt="avatar"
+                class="rounded-circle img-fluid" style="width: 150px;">
+                {% else %}
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
+                class="rounded-circle img-fluid" style="width: 150px;">
+                {% endif %}
+              <h5 class="my-3">{{user.first_name}} {{user.last_name}}</h5>
+              {% if role == "Estudiante"%}
+                <p class="text-muted mb-1">{{role}} de {{degree}}</p>
+              {% elif role == "Docente" %}
+                <p class="text-muted mb-1">{{role}} en</p>
+              {% endif %}
+              <p class="text-muted mb-4">Universidad de Talca</p>
+              {% if role == "Estudiante" %}
+              <div class="d-flex justify-content-center mb-2">
+                <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% if role == "Estudiante" %}
+            <div class="card mb-4 mb-lg-0">
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush rounded-3">
+                        {% comment %} aqui ir colocando las cosas del historial en un ciclo for {% endcomment %}
+                    </ul>
+                </div>
+            </div>
+          {% endif %}
+        </div>
+        <div class="col-lg-8">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Nombre</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.first_name}} {{user.last_name}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Correo institucional</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.email}}</p>
+                </div>
+              </div>
+              {% if role == "Estudiante" %}
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Correo personal</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.personal_mail}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Celular</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.phone_number}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Año de ingreso</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{year}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Carrera</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{degree}}</p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {%if role == "Estudiante" %}
+          <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4 mb-md-0">
+                    <div class="card-body">
+                        <p class="mb-4"> OFREZCO TUTORIA DE </p>
+                        <ul>
+                            {% comment %} En ciclo, colocar las ayudantias de interes {% endcomment %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4 mb-md-0">
+                  <div class="card-body">
+                      <p class="mb-4">OFREZCO AYUDANTIA DE</p>
+                      <ul>
+                          {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                      </ul>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4 mb-md-0">
+              <div class="card-body">
+                  <p class="mb-4">NECESITO AUXILIO EN</p>
+                  <ul>
+                      {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                  </ul>
+              </div>
+          </div>            
+        </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+</section>
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% endblock content %}

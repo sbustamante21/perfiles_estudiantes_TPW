@@ -41,25 +41,24 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                     
                     {% if request.user.is_authenticated%}
-                        {% if request.user.role == "0" %}
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
-                        </li>
-                        {% elif request.user.role != "0" %}
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Mi perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
-                        </li>
+                        {% if request.user.role == 0 %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
+                            </li>
+                        {% elif request.user.role != 0 %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{%url 'profile_page'%}">Mi perfil</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
+                            </li>
                         {% endif %}
-
                     {%else%}
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
