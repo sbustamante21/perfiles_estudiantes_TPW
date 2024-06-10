@@ -7,8 +7,8 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm, ProfileRegisterForm
-from .models import Student, Role, Profile, CurriculumPlan, Degree
+from .forms import StudentRegisterForm, UserRegisterForm
+from .models import Student, Role, CurriculumPlan, Degree, User
 from django.contrib.auth.views import LogoutView
 
 # Create your views here.
@@ -19,6 +19,9 @@ from django.contrib.auth.views import LogoutView
 def main_page(request):
     return render(request, "website/main_page.html", {})
 
+@login_required
+def admin_page(request):
+    return render(request, "website/admin_page.html")
 
 def do_login(request):
     if request.method == "POST":
@@ -30,9 +33,14 @@ def do_login(request):
 
             if user is not None:
                 auth.login(request, user)
-                return redirect(
-                    reverse("main_page")
-                )  # aca condicionar segun el rol de usuario
+                if user.role == "0":
+                    return redirect(
+                        reverse("admin_page")
+                    )
+                else:
+                    return redirect(
+                        reverse("main_page")
+                    )
             else:
                 messages.info(request, "Invalid credentials")
                 return redirect(reverse("login"))
@@ -50,10 +58,6 @@ def do_logout(request):
     return redirect("welcome")
 
 
-class CustomLoginView(auth_views.LoginView):
-    template_name = "website/login.html"
-
-
 def welcome(request):
     return render(request, "website/welcome.html")
 
@@ -61,36 +65,38 @@ def welcome(request):
 def register(request):
     return render(request, "website/register.html")
 
-
 def student_register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
-        profile_form = ProfileRegisterForm(request.POST)
         student_form = StudentRegisterForm(request.POST, request.FILES)
 
         email = request.POST.get("email")
 
-        if user_form.is_valid() and profile_form.is_valid() and student_form.is_valid():
+        if not email.endswith("@alumnos.utalca.cl"):
+            user_form.add_error("email", "You must use your institution's email.")
+            return render(
+                request,
+                "website/student_register.html",
+                {
+                    "user_form": user_form,
+                    "student_form": student_form,
+                },
+            )
+
+        if user_form.is_valid() and student_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data["password1"])
+            user.role = User.STUDENT
             user.save()
 
-            profile = profile_form.save(commit=False)
-            profile.user = user
-
-            default_role = Role.objects.get(name="ESTUDIANTE")
-            profile.role_id = default_role
-            profile.save()
-
             student = student_form.save(commit=False)
-            student.user_id = profile
+            student.user = user
             student.save()
 
-            return redirect(reverse("inicio"))
+            return redirect(reverse("welcome"))
 
     else:
         user_form = UserRegisterForm()
-        profile_form = ProfileRegisterForm()
         student_form = StudentRegisterForm()
 
     return render(
@@ -98,7 +104,6 @@ def student_register(request):
         "website/student_register.html",
         {
             "user_form": user_form,
-            "profile_form": profile_form,
             "student_form": student_form,
         },
     )
@@ -107,7 +112,6 @@ def student_register(request):
 def professor_register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
-        profile_form = ProfileRegisterForm(request.POST)
 
         email = request.POST.get("email")
 
@@ -118,35 +122,23 @@ def professor_register(request):
                 "website/professor_register.html",
                 {
                     "user_form": user_form,
-                    "profile_form": profile_form,
                 },
             )
 
-        if user_form.is_valid() and profile_form.is_valid():
+        if user_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data["password1"])
+            user.role = User.PROFESSOR
             user.save()
 
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            professor_role = Role.objects.get(name="DOCENTE")
-            profile.role_id = professor_role
-            profile.save()
-
-            return redirect(reverse("inicio"))
+            return redirect(reverse("welcome"))
     else:
         user_form = UserRegisterForm()
-        profile_form = ProfileRegisterForm()
 
     return render(
         request,
         "website/professor_register.html",
         {
             "user_form": user_form,
-            "profile_form": profile_form,
         },
     )
-
-
-def login(request):
-    return render(request, "website/login.html")
