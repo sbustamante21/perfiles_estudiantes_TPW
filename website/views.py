@@ -70,6 +70,35 @@ def do_logout(request):
         logout(request)
     return redirect("welcome")
 
+def delete_user(request):
+    user = request.user
+    # solamente podemos borrar user si student no es referenciado en ningun lado, y su user no aparece en contact
+    # solamente podemos borrar student si student no es referenciado en history o interest.
+    delete_user = False
+    delete_student = False
+    if user.role == user.STUDENT:
+        student = user.student
+        if not student.history_set.exists() and not student.interest_set.exists():
+            delete_student = True
+        if not user.receiver.exists() and not user.sender.exists() and delete_student:
+            delete_user = True
+        # ahora, si delete_user es true entonces sabemos que delete estudent es true.
+        if delete_user:
+            # como tenemos on_delete = CASCADE solamente hay que borrar student, de ahi se borra todo lo demas
+            student.delete()
+            user.delete()
+        # si no se puede borrar el usuario, a lo mejor solo se puede borrar estudiante
+        elif delete_student:
+            user.is_active = False # desactivar el usuario
+            # no borramos student pues si lo hacemos borramos al usuario tambien
+            # si borramos student sin borrar usuario dejamos algo incompleto, basicamente los datos de un profesor
+    # borrar en caso docente
+    else:
+       pass 
+    
+    return redirect("welcome")
+
+
 
 def welcome(request):
     return render(request, "website/welcome.html")

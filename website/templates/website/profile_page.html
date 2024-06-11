@@ -28,11 +28,12 @@
                 <p class="text-muted mb-1">{{role}} en</p>
               {% endif %}
               <p class="text-muted mb-4">Universidad de Talca</p>
-              {% if role == "Estudiante" %}
               <div class="d-flex justify-content-center mb-2">
-                <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
+                {% if role == "Estudiante" %}
+                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
+                {% endif %}
+                <a  href="{% url 'delete_user' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
               </div>
-              {% endif %}
             </div>
           </div>
           {% if role == "Estudiante" %}
