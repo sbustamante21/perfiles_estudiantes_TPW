@@ -24,12 +24,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-class Role(models.Model):
-    name = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.name
-
 class PeriodType(models.Model):
     name = models.CharField(max_length=15)
 
