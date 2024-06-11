@@ -32,7 +32,7 @@
                 {% if role == "Estudiante" %}
                   <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
                 {% endif %}
-                <a  href="{% url 'delete_user' %}" onclick="return confirm('Are you sure you want to delete this?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
+                <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
               </div>
             </div>
           </div>
