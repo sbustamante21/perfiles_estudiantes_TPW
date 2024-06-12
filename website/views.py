@@ -49,7 +49,17 @@ def do_logout(request):
         logout(request)
     return redirect("welcome")
 
-
+def delete_user(request):
+    user = request.user
+    detete_user = False
+    if user.role == user.DOCENTE:
+        if not user.receiver.exists() and not user.sender.exists() and delete_user:
+            delete_user = True
+        else: 
+            user.is_active = False
+            user.save()
+    return redirect("welcome")
+    
 class CustomLoginView(auth_views.LoginView):
     template_name = "website/login.html"
 
