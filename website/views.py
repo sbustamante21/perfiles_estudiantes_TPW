@@ -59,21 +59,24 @@ def admin_page(request, modelo=None):
 
         elif "editar" in request.POST:
             obj = model.objects.get(id=request.POST.get("id"))
+            print(obj.id, obj.user)
             form = form_model(instance=obj)
             editing = True
             id = obj.id
 
         elif "guardar" in request.POST:
-            form = form_model(request.POST)
-            if form.is_valid():
-                if request.POST.get("editing") == "True":
-                    obj = model.objects.get(id=request.POST.get("id"))
+            form = form_model(request.POST) # Se redeclara el form?
+            if request.POST.get("editing") == "True":
+                obj = model.objects.get(id=request.POST.get("id"))
+                form = form_model(request.POST, instance=obj)
+                if form.is_valid():
                     for field in editable_fields[modelo]:
-                        setattr(obj, field_name, form.cleaned_data[field_name])
+                        setattr(obj, field, form.cleaned_data[field])
                     obj.save()
                     editing=False
                     form = form_model()
-                else:
+            else:
+                if form.is_valid():
                     form.save()
                     form = form_model()
 
