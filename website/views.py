@@ -7,8 +7,8 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm
-from .models import Student, CurriculumPlan, Degree, User
+from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin
+from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
 from django.contrib.auth.views import LogoutView
 
 # Create your views here.
@@ -20,8 +20,65 @@ def main_page(request):
     return render(request, "website/main_page.html", {})
 
 @login_required
-def admin_page(request):
-    return render(request, "website/admin_page.html")
+def admin_page(request, modelo=None):
+
+    models = {
+        "estudiante": Student,
+        "usuarios": User, 
+
+    }
+
+    forms = {
+        "estudiante": StudentRegisterFormAdmin,
+        "user": UserRegisterForm,
+    }
+
+    fields = {
+        "estudiante": ["id", "admission_year", "personal_mail", "phone_number", "pfp", "user", "degree_id", "curriculum_plan_id"],
+    }
+
+    editable_fields = {
+        "estudiante": ["admission_year", "personal_mail", "phone_number", "user", "pfp", "degree_id", "curriculum_plan_id"],
+    }
+
+    if modelo not in models:
+        return redirect("welcome")
+
+    model = models[modelo]
+    form_model = forms[modelo]
+    objs = model.objects.all()
+    all_field_names = fields[modelo]
+    form = form_model()
+    editing = False
+    id = None
+
+    if request.method == "POST":
+
+        if "eliminar" in request.POST:
+            model.objects.get(id=request.POST.get("id")).delete()
+
+        elif "editar" in request.POST:
+            obj = model.objects.get(id=request.POST.get("id"))
+            form = form_model(instance=obj)
+            editing = True
+            id = obj.id
+
+        elif "guardar" in request.POST:
+            form = form_model(request.POST)
+            if form.is_valid():
+                if request.POST.get("editing") == "True":
+                    obj = model.objects.get(id=request.POST.get("id"))
+                    for field in editable_fields[modelo]:
+                        setattr(obj, field_name, form.cleaned_data[field_name])
+                    obj.save()
+                    editing=False
+                    form = form_model()
+                else:
+                    form.save()
+                    form = form_model()
+
+    context = {"model": model, "model_name":model._meta.verbose_name_plural, "model_fields":model._meta.fields, "objs":objs, "form":form, "editing":editing, "id":id, "raw_fields": all_field_names}
+    return render(request, "website/admin_page.html", context)
 
 def do_login(request):
     if request.method == "POST":
@@ -33,9 +90,9 @@ def do_login(request):
 
             if user is not None:
                 auth.login(request, user)
-                if user.role == "0":
+                if user.role == user.ADMIN:
                     return redirect(
-                        reverse("admin_page")
+                        reverse("admin_page", kwargs={"modelo": "estudiante"})
                     )
                 else:
                     return redirect(

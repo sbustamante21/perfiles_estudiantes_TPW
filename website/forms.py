@@ -75,3 +75,52 @@ class StudentRegisterForm(forms.ModelForm):
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")
         return number
+
+class StudentRegisterFormAdmin(forms.ModelForm):
+    admission_year = forms.IntegerField(required=True)
+    personal_mail = forms.EmailField(required=False)
+    phone_number = forms.IntegerField(required=False)
+    curriculum_plan_id = forms.ModelChoiceField(
+        queryset=CurriculumPlan.objects.all(), required=True
+    )
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(), required=True
+    )
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
+
+    class Meta:
+        model = Student
+        fields = [
+            "admission_year",
+            "personal_mail",
+            "phone_number",
+            "pfp",
+            "degree_id",
+            "curriculum_plan_id",
+            "user",
+        ]
+
+    def clean_admission_year(self):
+        admission_year = self.cleaned_data.get("admission_year")
+
+        if not datetime.datetime.now().year >= admission_year >= 1980:
+            raise forms.ValidationError("Year out of bounds")
+        return admission_year
+
+    def clean_personal_mail(self):
+        email = self.cleaned_data.get("personal_mail")
+
+        if email != "":
+            if Student.objects.filter(personal_mail=email).exists():
+                raise forms.ValidationError("This email is already used")
+        return email
+
+    def clean_phone_number(self):
+        number = self.cleaned_data.get("phone_number")
+
+        if number is not None:
+            if Student.objects.filter(phone_number=number).exists():
+                raise forms.ValidationError("This phone number is already used")
+            elif len(str(number)) != 9:
+                raise forms.ValidationError("The phone number must be 9 digits long")
+        return number
