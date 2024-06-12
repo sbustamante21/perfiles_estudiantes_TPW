@@ -96,7 +96,7 @@ def delete_user(request):
             user.is_active = False
             user.save()
     # borrar en caso docente
-    elif user.role == user.DOCENTE:
+    elif user.role == user.PROFESSOR:
         if not user.receiver.exists() and not user.sender.exists() and delete_user:
             user.delete()
         else: 
