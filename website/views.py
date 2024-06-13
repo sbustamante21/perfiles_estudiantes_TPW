@@ -6,8 +6,8 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay, UserRegisterFormAdmin
-from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
+from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay, UserRegisterFormAdmin, StudentHistory
+from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType, History, Interest, Subject
 from django.contrib.auth.views import LogoutView
 
 # Create your views here.
@@ -139,7 +139,24 @@ def profile_page(request):
         adm_year = user.student.admission_year
         pfp = user.student.pfp
         cplan = user.student.curriculum_plan_id
-        context = {"user": user, "role": "Estudiante", "degree":degree, "year":adm_year, "pfp":pfp, "cplan":cplan}
+        student_history = History.objects.filter(student_id=user.student)
+
+        form = StudentHistory(student_id=user.student)
+
+        if request.method == "POST":
+            if "eliminar" in request.POST:
+                History.objects.get(id=request.POST.get("id")).delete()
+            if "guardar" in request.POST:
+                form = StudentHistory(request.POST, student_id = user.student)
+                if form.is_valid():
+                    form.save()
+                    form = StudentHistory(student_id = user.student)
+
+
+        context = {"user": user, "role": "Estudiante", "degree":degree, "year":adm_year, "pfp":pfp, "cplan":cplan,
+                     "history": student_history, "fields": ["año", "periodo", "ramo", "tipo"], "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
+                     "form_history": form,
+                     }
     elif user.role == user.PROFESSOR:
         context = {"user":user, "role":"Docente"}
 

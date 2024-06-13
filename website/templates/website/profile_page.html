@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load bootstrap5 %}
 {% block content %}
+{% load website_filters %}
 
 
 <div class="container mt-5 pt-5">
@@ -39,11 +40,45 @@
           {% if role == "Estudiante" %}
             <div class="card mb-4 mb-lg-0">
                 <div class="card-body p-0">
-                    <ul class="list-group list-group-flush rounded-3">
-                        {% comment %} aqui ir colocando las cosas del historial en un ciclo for {% endcomment %}
-                    </ul>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                            {% for field in fields %}
+                                <th scope="col">{{ field }}</th>
+                            {% endfor %}
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% for his in history %}
+                          <tr>
+                              {% for field in raw_fields %}
+                                  <td>{{ his|attr:field }}</td>
+                              {% endfor %}
+                              <td>
+                                  <form method="post" style="display:inline;">
+                                      {% csrf_token %}
+                                      <input type="hidden" name="id" value="{{ his.id }}">
+                                      <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                                  </form>
+                              </td>
+                          </tr>
+                      {% endfor %}
+                  </tbody>
+                    </table>
                 </div>
             </div>
+            <div class="container">
+              <div class="card card-body">
+                  <form method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      {% bootstrap_form form_history %}
+                      {% buttons %}
+                        <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                      {% endbuttons %}
+                  </form>
+              </div>
+          </div>
           {% endif %}
         </div>
         <div class="col-lg-8">
