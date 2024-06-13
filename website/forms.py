@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Student, CurriculumPlan, Degree, User, PeriodType
+from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
 from django.core.validators import MaxValueValidator
 import datetime
 
@@ -98,6 +98,15 @@ class CurriculumPlanFormAdmin(forms.ModelForm):
             "degree_id",
         ]   
 
+class InterestTypeFormAdmin(forms.ModelForm):
+    name = forms.CharField(required=True)
+    
+    class Meta:
+        model = InterestType
+        fields = [
+            "name",
+        ]
+        
 class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)

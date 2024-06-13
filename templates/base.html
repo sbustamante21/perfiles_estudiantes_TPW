@@ -54,6 +54,9 @@
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'plan_curricular' %}">Plan Curricular</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'tipo_interes' %}">Tipo de interes</a>
+                            </li>
                         {% elif request.user.role != user.ADMIN %}
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
