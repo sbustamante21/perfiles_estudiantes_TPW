@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
+from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType, History, Subject
 from django.core.validators import MaxValueValidator
 import datetime
 
@@ -8,6 +8,41 @@ class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active:
             raise forms.ValidationError("Cuenta inactiva. Por favor, comuníquese con los administradores: sbustamante21@alumnos.utalca.cl, mlolas19@alumnos.utalca.cl, cecastillo19@alumnos.utalca.cl")
+
+class StudentHistory(forms.ModelForm):
+    NUMBER_CHOICES = [
+        (1, '1'),
+        (2, '2'),
+    ]
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    interest_type_id = forms.ModelChoiceField(queryset=InterestType.objects.exclude(name="AUXILIO"), required=True)
+    year = forms.IntegerField(required=True)
+    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
+    student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, disabled=True, widget=forms.Select(attrs={"class":"hidden"}))
+
+    class Meta:
+        model = History
+        fields = [
+            "subject_id",
+            "interest_type_id",
+            "year",
+            "period",
+            "student_id",
+        ]
+    
+    def __init__(self, *args, **kwargs):
+        student_id = kwargs.pop("student_id", None)
+        super(StudentHistory, self).__init__(*args, **kwargs)
+        if student_id:
+            self.fields["student_id"].initial = student_id
+
+    def clean_year(self):
+        year = self.cleaned_data.get("year")
+
+        if not datetime.datetime.now().year >= year >= 1980:
+            raise forms.ValidationError("Year out of bounds")
+        return year
+    
 
 class UserRegisterForm(UserCreationForm):
     username = forms.CharField(max_length=30, required=True)
