@@ -7,7 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin
+from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin
 from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
 from django.contrib.auth.views import LogoutView
 
@@ -26,22 +26,26 @@ def admin_page(request, modelo=None):
         "estudiante": Student,
         "usuarios": User, 
         "tipo_periodo": PeriodType,
+        "plan_curricular": CurriculumPlan,
     }
 
     forms = {
         "estudiante": StudentRegisterFormAdmin,
         "user": UserRegisterForm,
         "tipo_periodo": PeriodTypeFormAdmin,
+        "plan_curricular": CurriculumPlanFormAdmin,
     }
 
     fields = {
         "estudiante": ["id", "admission_year", "personal_mail", "phone_number", "pfp", "user", "degree_id", "curriculum_plan_id"],
         "tipo_periodo": ["id", "name"],
+        "plan_curricular": ["id", "name", "impl_year", "degree_id"],
     }
 
     editable_fields = {
         "estudiante": ["admission_year", "personal_mail", "phone_number", "user", "pfp", "degree_id", "curriculum_plan_id"],
         "tipo_periodo": ["name"],
+        "plan_curricular": ["name", "impl_year", "degree_id"],
     }
 
     if modelo not in models:

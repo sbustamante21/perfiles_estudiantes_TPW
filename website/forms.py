@@ -85,6 +85,19 @@ class PeriodTypeFormAdmin(forms.ModelForm):
             "name",
         ]   
 
+class CurriculumPlanFormAdmin(forms.ModelForm):
+    name = forms.CharField(required=True)
+    impl_year = forms.IntegerField()
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
+
+    class Meta:
+        model = CurriculumPlan
+        fields = [
+            "name",
+            "impl_year",
+            "degree_id",
+        ]   
+
 class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)
