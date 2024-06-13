@@ -87,6 +87,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
         queryset=User.objects.all(), required=True
     )
     degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
+    pfp = forms.ImageField(required=False)
 
     class Meta:
         model = Student

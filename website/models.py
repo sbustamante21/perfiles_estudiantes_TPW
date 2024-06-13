@@ -79,7 +79,7 @@ class Student(models.Model):
     admission_year = models.IntegerField()
     personal_mail = models.EmailField(blank=True, null=True)
     phone_number = models.IntegerField(blank=True, null=True)
-    pfp = models.ImageField(null=True, blank=True, upload_to='profile_images')
+    pfp = models.ImageField(null=True, blank=True, upload_to='profile_images/')
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     degree_id = models.ForeignKey(Degree, on_delete=models.CASCADE)
     curriculum_plan_id = ChainedForeignKey(

@@ -65,7 +65,7 @@ def admin_page(request, modelo=None):
             id = obj.id
 
         elif "guardar" in request.POST:
-            form = form_model(request.POST) # Se redeclara el form?
+            #form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
                 form = form_model(request.POST, instance=obj)
@@ -76,6 +76,7 @@ def admin_page(request, modelo=None):
                     editing=False
                     form = form_model()
             else:
+                form = form_model(request.POST)
                 if form.is_valid():
                     form.save()
                     form = form_model()
