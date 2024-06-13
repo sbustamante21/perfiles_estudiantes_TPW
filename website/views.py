@@ -86,7 +86,7 @@ def student_register(request):
         email = request.POST.get("email")
 
         if not email.endswith("@alumnos.utalca.cl"):
-            user_form.add_error("email", "You must use your institution's email.")
+            user_form.add_error("email", "Debes utilizar tu correo institucional.")
             return render(
                 request,
                 "website/student_register.html",
@@ -129,7 +129,7 @@ def professor_register(request):
         email = request.POST.get("email")
 
         if not email.endswith("@utalca.cl"):
-            user_form.add_error("email", "You must use your institution's email.")
+            user_form.add_error("email", "Debes utilizar tu correo institucional.")
             return render(
                 request,
                 "website/professor_register.html",

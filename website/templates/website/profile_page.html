@@ -4,7 +4,7 @@
 
 
 <div class="container mt-5 pt-5">
-    <h3>hola, {{user.username}} has iniciado como {{role}}</h1>
+    <h3>Hola, {{user.username}} has iniciado sesión como {{role}}</h1>
 </div>
 
 <section style="background-color: #eee;">
@@ -110,9 +110,13 @@
             <div class="col-md-4">
                 <div class="card mb-4 mb-md-0">
                     <div class="card-body">
-                        <p class="mb-4"> OFREZCO TUTORIA DE </p>
+                        <p class="mb-4"> OFREZCO TUTORIA DE:</p>
                         <ul>
-                            {% comment %} En ciclo, colocar las ayudantias de interes {% endcomment %}
+                          {% for tutoria in tutorias %}
+                          <li>{{tutoria}}</li>
+                            {% empty %}
+                          <li>No has agregado tutorías</li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
@@ -120,9 +124,13 @@
             <div class="col-md-4">
                 <div class="card mb-4 mb-md-0">
                   <div class="card-body">
-                      <p class="mb-4">OFREZCO AYUDANTIA DE</p>
+                      <p class="mb-4">OFREZCO AYUDANTIA DE:</p>
                       <ul>
-                          {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                        {% for ayudantia in ayudantias %}
+                        <li>{{ ayudantia }}</li>
+                          {% empty %}
+                        <li>No has agregado ayudantías</li>
+                          {% endfor %}
                       </ul>
                   </div>
               </div>
@@ -130,9 +138,13 @@
           <div class="col-md-4">
             <div class="card mb-4 mb-md-0">
               <div class="card-body">
-                  <p class="mb-4">NECESITO AUXILIO EN</p>
+                  <p class="mb-4">NECESITO AUXILIO EN:</p>
                   <ul>
-                      {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                    {% for auxilio in auxilios %}
+                    <li>{{auxilio}}</li>
+                      {% empty %}
+                    <li>No has agregado ramos donde necesitas ayuda</li>
+                      {% endfor %}
                   </ul>
               </div>
           </div>            
