@@ -33,6 +33,46 @@ class UserRegisterForm(UserCreationForm):
             raise forms.ValidationError("This value already exists.")
         return email
 
+class UserRegisterFormAdmin(forms.ModelForm):
+    username = forms.CharField(max_length=30, required=True)
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    is_active = forms.BooleanField(required=False, initial=True, label="Activo")
+    role = forms.ChoiceField(choices=User.ROLE_CHOICES, label="Rol")
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "is_active",
+            "role"
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get('instance', None)
+        super(UserRegisterFormAdmin, self).__init__(*args, **kwargs)
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        if User.objects.filter(email=email).exists() and self.instance.email != email:
+            raise forms.ValidationError("This value already exists.")
+        return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data['password']
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+        return user
 
 class StudentRegisterForm(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
@@ -144,6 +184,10 @@ class StudentRegisterFormAdmin(forms.ModelForm):
             "curriculum_plan_id",
             "user",
         ]
+    
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get('instance', None)
+        super(StudentRegisterFormAdmin, self).__init__(*args, **kwargs)
 
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
@@ -156,7 +200,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
         email = self.cleaned_data.get("personal_mail")
 
         if email != "":
-            if Student.objects.filter(personal_mail=email).exists():
+            if Student.objects.filter(personal_mail=email).exists() and self.instance.personal_mail != email:
                 raise forms.ValidationError("This email is already used")
         return email
 
@@ -164,7 +208,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
         number = self.cleaned_data.get("phone_number")
 
         if number is not None:
-            if Student.objects.filter(phone_number=number).exists():
+            if Student.objects.filter(phone_number=number).exists() and self.instance.number != number:
                 raise forms.ValidationError("This phone number is already used")
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")

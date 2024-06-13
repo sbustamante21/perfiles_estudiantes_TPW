@@ -9,7 +9,7 @@
         <thead>
             <tr>
                 {% for field in model_fields %}
-                    <th scope="col">{{ field.verbose_name }}</th>
+                    <th scope="col">{{ field }}</th>
                 {% endfor %}
                 <th>Actions</th>
             </tr>
@@ -40,7 +40,7 @@
 
 <div class="col">
     <div class="card card-body">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form form %}
             {% buttons %}
