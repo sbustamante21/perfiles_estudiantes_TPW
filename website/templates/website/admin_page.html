@@ -1,8 +1,60 @@
 {% extends 'base.html' %}
 {% load bootstrap5 %}
 {% block content %}
+{% load website_filters %}
 
-<h1 class="mt-5 pt-5">sample admin page</h1>
+<div class="container mt-5 pt-5">
+    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name }}</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                {% for field in model_fields %}
+                    <th scope="col">{{ field.verbose_name }}</th>
+                {% endfor %}
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in objs %}
+                <tr>
+                    {% for field in raw_fields %}
+                        <td>{{ obj|attr:field }}</td>
+                    {% endfor %}
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ obj.id }}">
+                            <button class = "btn btn-warning" type="submit" name="editar">Edit</button>
+                        </form>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ obj.id }}">
+                            <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="col">
+    <div class="card card-body">
+        <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                {% if editing == True %}
+                    <button class="btn btn-primary" type="submit" name="guardar">Actualizar</button>
+                {% else %}
+                    <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                {% endif %}
+            {% endbuttons %}
+            <input type="hidden" name="editing" value="{{ editing }}">
+            <input type="hidden" name="id" value="{{ id }}">
+        </form>
+    </div>
+</div>
 
 {% bootstrap_css %}
 {% bootstrap_javascript %}
