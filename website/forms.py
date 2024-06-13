@@ -1,9 +1,13 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
 from django.core.validators import MaxValueValidator
 import datetime
 
+class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_active:
+            raise forms.ValidationError("Cuenta inactiva. Por favor, comuníquese con los administradores: sbustamante21@alumnos.utalca.cl, mlolas19@alumnos.utalca.cl, cecastillo19@alumnos.utalca.cl")
 
 class UserRegisterForm(UserCreationForm):
     username = forms.CharField(max_length=30, required=True)
