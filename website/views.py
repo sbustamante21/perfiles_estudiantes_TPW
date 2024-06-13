@@ -6,7 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay
+from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay, UserRegisterFormAdmin
 from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
 from django.contrib.auth.views import LogoutView
 
@@ -23,7 +23,7 @@ def admin_page(request, modelo=None):
 
     models = {
         "estudiante": Student,
-        "usuarios": User, 
+        "usuario": User, 
         "tipo_periodo": PeriodType,
         "plan_curricular": CurriculumPlan,
         "tipo_interes" : InterestType,
@@ -32,7 +32,7 @@ def admin_page(request, modelo=None):
 
     forms = {
         "estudiante": StudentRegisterFormAdmin,
-        "user": UserRegisterForm,
+        "usuario": UserRegisterFormAdmin,
         "tipo_periodo": PeriodTypeFormAdmin,
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes" : InterestTypeFormAdmin,
@@ -41,6 +41,7 @@ def admin_page(request, modelo=None):
 
     fields = {
         "estudiante": ["id", "admission_year", "personal_mail", "phone_number", "pfp", "user", "degree_id", "curriculum_plan_id"],
+        "usuario": ["id", "password", "username", "first_name", "last_name", "email",   "is_active", "role"],
         "tipo_periodo": ["id", "name"],
         "plan_curricular": ["id", "name", "impl_year", "degree_id"],
         "tipo_interes": ["id", "name"],
@@ -49,6 +50,7 @@ def admin_page(request, modelo=None):
 
     editable_fields = {
         "estudiante": ["admission_year", "personal_mail", "phone_number", "user", "pfp", "degree_id", "curriculum_plan_id"],
+        "usuario": ["password", "username", "first_name", "last_name", "email",   "is_active", "role"],
         "tipo_periodo": ["name"],
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
@@ -66,6 +68,11 @@ def admin_page(request, modelo=None):
     editing = False
     id = None
 
+    verbose_names = []
+    for f in model._meta.fields:
+        if f.name in all_field_names:
+            verbose_names.append(f.verbose_name)
+
     if request.method == "POST":
 
         if "eliminar" in request.POST:
@@ -81,20 +88,23 @@ def admin_page(request, modelo=None):
             #form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
-                form = form_model(request.POST, instance=obj)
+                form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
-                        setattr(obj, field, form.cleaned_data[field])
+                        if field != "password":
+                            setattr(obj, field, form.cleaned_data[field])
+                        else:
+                            obj.set_password(form.cleaned_data[field])
                     obj.save()
                     editing=False
                     form = form_model()
             else:
-                form = form_model(request.POST)
+                form = form_model(request.POST, request.FILES)
                 if form.is_valid():
                     form.save()
                     form = form_model()
 
-    context = {"model": model, "model_name":model._meta.verbose_name_plural, "model_fields":model._meta.fields, "objs":objs, "form":form, "editing":editing, "id":id, "raw_fields": all_field_names}
+    context = {"model": model, "model_name":model._meta.verbose_name_plural, "model_fields":verbose_names, "objs":objs, "form":form, "editing":editing, "id":id, "raw_fields": all_field_names}
     return render(request, "website/admin_page.html", context)
 
 def do_login(request):
