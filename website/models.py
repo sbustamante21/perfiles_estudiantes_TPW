@@ -25,14 +25,14 @@ class User(AbstractUser):
         return self.username
 
 class PeriodType(models.Model):
-    name = models.CharField(max_length=15)
+    name = models.CharField(max_length=15, unique=True)
 
     def __str__(self):
         return self.name
 
 
 class InterestType(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
@@ -50,7 +50,7 @@ class Contact(models.Model):
 
 
 class Degree(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name

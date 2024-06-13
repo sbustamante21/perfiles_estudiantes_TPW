@@ -107,6 +107,15 @@ class InterestTypeFormAdmin(forms.ModelForm):
             "name",
         ]
         
+class DegreeFormAdmin(forms.ModelForm):
+    name = forms.CharField(required=True)
+    
+    class Meta:
+        model = Degree
+        fields = [
+            "name",
+        ]
+        
 class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)
