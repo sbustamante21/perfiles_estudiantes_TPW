@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Student, CurriculumPlan, Degree, User
+from .models import Student, CurriculumPlan, Degree, User, PeriodType
 from django.core.validators import MaxValueValidator
 import datetime
 
@@ -75,6 +75,15 @@ class StudentRegisterForm(forms.ModelForm):
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")
         return number
+
+class PeriodTypeFormAdmin(forms.ModelForm):
+    name = forms.CharField(required=True)
+
+    class Meta:
+        model = PeriodType
+        fields = [
+            "name",
+        ]   
 
 class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
