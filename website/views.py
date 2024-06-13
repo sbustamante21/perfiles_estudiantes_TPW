@@ -2,12 +2,11 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages, auth
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin
+from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay
 from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType
 from django.contrib.auth.views import LogoutView
 
@@ -100,30 +99,26 @@ def admin_page(request, modelo=None):
 
 def do_login(request):
     if request.method == "POST":
-        form = AuthenticationForm(data=request.POST)
+        form = AuthenticationFormWithInactiveUsersOkay(data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
             user = auth.authenticate(username=username, password=password)
 
-            if user is not None:
-                auth.login(request, user)
-                if user.role == user.ADMIN:
-                    return redirect(
-                        reverse("admin_page", kwargs={"modelo": "estudiante"})
-                    )
-                else:
-                    return redirect(
-                        reverse("main_page")
-                    )
-            else:
-                messages.info(request, "Invalid credentials")
-                return redirect(reverse("login"))
+            if user:
+                    auth.login(request, user)
+                    if user.role == user.ADMIN:
+                        return redirect(
+                            reverse("admin_page", kwargs={"modelo": "estudiante"})
+                        )
+                    else:
+                        return redirect(
+                            reverse("main_page")
+                        )
         else:
-            messages.error(request, "Error processing your request")
             return render(request, "website/login.html", {"form": form})
     else:
-        form = AuthenticationForm()
+        form = AuthenticationFormWithInactiveUsersOkay()
         return render(request, "website/login.html", {"form": form})
 
 @login_required
