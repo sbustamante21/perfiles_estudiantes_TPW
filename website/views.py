@@ -84,7 +84,7 @@ def admin_page(request, modelo=None):
             "role",
         ],
         "tipo_periodo": ["id", "name"],
-        "plan_curricular": ["id", "name", "impl_year", "degree_id"],
+        "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
     }
