@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType, History, Subject
+from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType, History, Subject, Interest
 from django.core.validators import MaxValueValidator
 import datetime
 
@@ -248,3 +248,23 @@ class StudentRegisterFormAdmin(forms.ModelForm):
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")
         return number
+
+class StudentInterest(forms.ModelForm):
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    interest_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, disabled=True, widget=forms.Select(attrs={"class":"hidden"}))
+
+    class Meta:
+        model = Interest
+        fields = [
+            "subject_id",
+            "interest_type_id",
+            "student_id",
+        ]
+    
+    def __init__(self, *args, **kwargs):
+        student_id = kwargs.pop("student_id", None)
+        super(StudentInterest, self).__init__(*args, **kwargs)
+        if student_id:
+            self.fields["student_id"].initial = student_id
+        
