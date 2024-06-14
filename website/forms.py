@@ -97,7 +97,7 @@ class UserRegisterFormAdmin(forms.ModelForm):
     last_name = forms.CharField(max_length=30, required=True)
     is_active = forms.BooleanField(required=False, initial=True, label="Activo")
     role = forms.ChoiceField(choices=User.ROLE_CHOICES, label="Rol")
-    password = forms.CharField(max_length=30, required=True)
+    password = forms.CharField(max_length=100, required=True)
 
     class Meta:
         model = User
@@ -191,7 +191,7 @@ class PeriodTypeFormAdmin(forms.ModelForm):
 
 class CurriculumPlanFormAdmin(forms.ModelForm):
     name = forms.CharField(required=True)
-    impl_year = forms.IntegerField()
+    impl_year = forms.IntegerField(required=True)
     degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
 
     class Meta:
