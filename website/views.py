@@ -6,7 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
 from django.contrib.auth import views as auth_views
-from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay, UserRegisterFormAdmin, StudentHistory
+from .forms import StudentRegisterForm, UserRegisterForm, StudentRegisterFormAdmin, PeriodTypeFormAdmin, CurriculumPlanFormAdmin, InterestTypeFormAdmin, DegreeFormAdmin, AuthenticationFormWithInactiveUsersOkay, UserRegisterFormAdmin, StudentHistory, StudentInterest
 from .models import Student, CurriculumPlan, Degree, User, PeriodType, InterestType, History, Interest, Subject
 from django.contrib.auth.views import LogoutView
 
@@ -140,22 +140,30 @@ def profile_page(request):
         pfp = user.student.pfp
         cplan = user.student.curriculum_plan_id
         student_history = History.objects.filter(student_id=user.student)
+        student_help = Interest.objects.filter(student_id=user.student, interest_type_id=InterestType.objects.get(name="AUXILIO"))
 
         form = StudentHistory(student_id=user.student)
 
         if request.method == "POST":
+            if "lista_aux" in request.POST or "lista_int" in request.POST:
+                model = Interest
+            elif "lista_hist" in request.POST:
+                model = History
             if "eliminar" in request.POST:
-                History.objects.get(id=request.POST.get("id")).delete()
+                model.objects.get(id=request.POST.get("id")).delete()
             if "guardar" in request.POST:
-                form = StudentHistory(request.POST, student_id = user.student)
+                if "lista_hist" in request.POST:
+                    form = StudentHistory(request.POST, student_id = user.student)
+                elif "lista_int" in request.POST:
+                    form = StudentInterest(request.POST, student_id = user.student)
                 if form.is_valid():
                     form.save()
-                    form = StudentHistory(student_id = user.student)
-
+                    form = model(student_id = user.student)
 
         context = {"user": user, "role": "Estudiante", "degree":degree, "year":adm_year, "pfp":pfp, "cplan":cplan,
                      "history": student_history, "fields": ["año", "periodo", "ramo", "tipo"], "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
-                     "form_history": form,
+                     "form_history": StudentHistory(student_id = user.student), "help_list": student_help, "interest_fields": ["subject_id"], 
+                     "form_interest": StudentInterest(student_id = user.student),
                      }
     elif user.role == user.PROFESSOR:
         context = {"user":user, "role":"Docente"}

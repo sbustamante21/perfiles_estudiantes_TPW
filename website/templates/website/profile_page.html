@@ -58,6 +58,7 @@
                               <td>
                                   <form method="post" style="display:inline;">
                                       {% csrf_token %}
+                                      <input type="hidden" name="lista_hist">
                                       <input type="hidden" name="id" value="{{ his.id }}">
                                       <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
                                   </form>
@@ -72,13 +73,14 @@
               <div class="card card-body">
                   <form method="POST" enctype="multipart/form-data">
                       {% csrf_token %}
+                      <input type="hidden" name="lista_hist">
                       {% bootstrap_form form_history %}
                       {% buttons %}
                         <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
                       {% endbuttons %}
                   </form>
               </div>
-          </div>
+            </div>
           {% endif %}
         </div>
         <div class="col-lg-8">
@@ -176,11 +178,36 @@
             <div class="card mb-4 mb-md-0">
               <div class="card-body">
                   <p class="mb-4">NECESITO AUXILIO EN</p>
+      
                   <ul>
-                      {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                    {% for help in help_list %}
+                      {% for field in interest_fields %}
+                      <li>
+                        {{ help|attr:field }}
+                        <form method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <input type="hidden" name="lista_aux">
+                          <input type="hidden" name="id" value="{{ help.id }}">
+                          <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                      </form>
+                      </li>
+                      {% endfor %}
+                    {% endfor %}
                   </ul>
               </div>
           </div>            
+        </div>
+        <div class="container">
+          <div class="card card-body">
+              <form method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <input type="hidden" name="lista_int">
+                  {% bootstrap_form form_interest %}
+                  {% buttons %}
+                    <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                  {% endbuttons %}
+              </form>
+          </div>
         </div>
         {% endif %}
     </div>
