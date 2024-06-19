@@ -30,6 +30,8 @@ from .models import (
     Interest,
     Subject,
 )
+
+from .decorators import role_required
 from django.contrib.auth.views import LogoutView
 
 # Create your views here.
@@ -41,7 +43,7 @@ def main_page(request):
     return render(request, "website/main_page.html", {})
 
 
-@login_required
+@role_required([User.ADMIN])
 def admin_page(request, modelo=None):
 
     models = {
@@ -197,7 +199,7 @@ def do_login(request):
         return render(request, "website/login.html", {"form": form})
 
 
-@login_required
+@role_required([User.PROFESSOR, User.STUDENT])
 def profile_page(request):
     user = request.user
     if user.role == user.STUDENT:
