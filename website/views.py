@@ -18,6 +18,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
+    HistoryFormAdmin
 )
 from .models import (
     Student,
@@ -51,6 +52,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlan,
         "tipo_interes": InterestType,
         "carrera": Degree,
+        "historial": History,
     }
 
     forms = {
@@ -60,6 +62,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
+        "historial": HistoryFormAdmin,
     }
 
     fields = {
@@ -87,6 +90,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
+        "historial": ["id", "year", "period", "interest_type_id", "subject_id", "student_id"],
     }
 
     editable_fields = {
@@ -112,6 +116,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
         "carrera": ["name"],
+        "historial": ["year", "period", "interest_type_id", "subject_id", "student_id"],
     }
 
     if modelo not in models:
