@@ -221,6 +221,25 @@ class DegreeFormAdmin(forms.ModelForm):
         fields = [
             "name",
         ]
+        
+class SubjectForAdmin(forms.ModelForm):
+    NUMBER_CHOICES = [
+        (1, "1"),
+        (2, "2"),
+    ]
+    name = forms.CharField(required=True)
+    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
+    period_type = forms.ModelChoiceField(queryset=PeriodType.objects.all(),required=True)
+    plan_id = forms.ModelChoiceField(queryset=CurriculumPlan.objects.all(), required=True)
+    
+    class Meta:
+        model = Subject
+        fields = [
+            "name",
+            "period",
+            "period_type",
+            "plan_id",
+        ]
 
 
 class StudentRegisterFormAdmin(forms.ModelForm):
