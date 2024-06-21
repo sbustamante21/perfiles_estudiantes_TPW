@@ -202,6 +202,18 @@ class StudentRegisterForm(forms.ModelForm):
                 raise forms.ValidationError("The phone number must be 9 digits long")
         return number
 
+class StudentProfilePicture(forms.ModelForm):
+    pfp = forms.ImageField(required=False)
+
+    class Meta:
+        model = Student
+        fields = ["pfp"]
+    
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get('instance', None)
+        super(StudentProfilePicture, self).__init__(*args, **kwargs)
+
+
 
 class PeriodTypeFormAdmin(forms.ModelForm):
     name = forms.CharField(required=True)
@@ -298,7 +310,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
         if number is not None:
             if (
                 Student.objects.filter(phone_number=number).exists()
-                and self.instance.number != number
+                and self.instance.phone_number != number
             ):
                 raise forms.ValidationError("This phone number is already used")
             elif len(str(number)) != 9:

@@ -18,6 +18,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
+    StudentProfilePicture,
 )
 from .models import (
     Student,
@@ -148,10 +149,15 @@ def admin_page(request, modelo=None):
                 form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
-                        if field != "password":
+                        if field != "password" and field != "pfp":
                             setattr(obj, field, form.cleaned_data[field])
-                        else:
+                        elif field == "password":
                             obj.set_password(form.cleaned_data[field])
+                        elif field == "pfp":
+                            if form.cleaned_data.get("pfp") is False:
+                                setattr(obj, field, None)
+                            else:
+                                setattr(obj, field, form.cleaned_data[field])
                     obj.save()
                     editing = False
                     form = form_model()
@@ -200,6 +206,7 @@ def do_login(request):
 @login_required
 def profile_page(request):
     user = request.user
+    print(user.student)
     if user.role == user.STUDENT:
         degree = user.student.degree_id
         adm_year = user.student.admission_year
@@ -225,9 +232,20 @@ def profile_page(request):
                     form = StudentHistory(request.POST, student_id=user.student)
                 elif "lista_int" in request.POST:
                     form = StudentInterest(request.POST, student_id=user.student)
-                if form.is_valid():
+                elif "pfp_estudiante" in request.POST:
+                    form = StudentProfilePicture(request.POST, request.FILES, instance=user.student)
+                if form.is_valid() and not "pfp_estudiante" in request.POST:
                     form.save()
-                    form = model(student_id=user.student)
+                    #form = model(student_id=user.student) # ????
+                else:
+                    if form.is_valid():
+                        if form.cleaned_data.get("pfp") is False:
+                            user.student.pfp = None
+                        else:
+                            user.student.pfp = form.cleaned_data["pfp"]
+
+                        user.student.save()
+                        return redirect("profile_page")
 
         context = {
             "user": user,
@@ -243,7 +261,9 @@ def profile_page(request):
             "help_list": student_help,
             "interest_fields": ["subject_id"],
             "form_interest": StudentInterest(student_id=user.student),
+            "pfp_form": StudentProfilePicture(instance=user.student),
         }
+
     elif user.role == user.PROFESSOR:
         context = {"user": user, "role": "Docente"}
 
