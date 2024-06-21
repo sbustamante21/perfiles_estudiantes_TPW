@@ -36,6 +36,9 @@
                 <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
                 {% if role == "Docente" %}
                   <a  href="{% url 'professor_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
+
+                {% elif role == "Estudiante" %}
+                  <a  href="{% url 'student_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
                 {% endif %}
               </div>
             </div>

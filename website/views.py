@@ -338,7 +338,79 @@ def professor_edit(request):
             "user_form": user_form,
         },
     )
-        
+
+def student_edit(request):
+
+    user = request.user
+    student = user.student
+
+    student_editable_fields = [
+            "admission_year",
+            "personal_mail",
+            "phone_number",
+            "degree_id",
+            "curriculum_plan_id",
+        ]
+
+    user_editable_fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password1",
+            "password2",
+        ]
+
+    if request.method == "POST":
+        user_form = UserRegisterForm(request.POST, instance=user)
+        student_form = StudentRegisterForm(request.POST, request.FILES, instance=student, user=user)
+
+        email = request.POST.get("email")
+
+        if not email.endswith("@alumnos.utalca.cl"):
+            user_form.add_error("email", "You must use your institution's email.")
+            return render(
+                request,
+                "website/student_edit.html",
+                {
+                    "user_form": user_form,
+                    "student_form": student_form,
+                },
+            )
+
+        if user_form.is_valid() and student_form.is_valid():
+            user.role = User.STUDENT
+
+            for field in user_editable_fields:
+                if field != "password1" and field != "password2":
+                    setattr(user, field, user_form.cleaned_data[field])
+                else:
+                    user.set_password(user_form.cleaned_data["password1"])
+            user.save()
+            
+            for field in student_editable_fields:
+                setattr(student, field, student_form.cleaned_data[field])
+            student.user = user
+
+            student.save()
+
+            if user == request.user:
+                update_session_auth_hash(request, user)
+
+            return redirect(reverse("profile_page"))
+
+    else:
+        user_form = UserRegisterForm(instance=user)
+        student_form = StudentRegisterForm(instance=student, user=user)
+
+    return render(
+        request,
+        "website/student_edit.html",
+        {
+            "user_form": user_form,
+            "student_form": student_form,
+        },
+    )
 
 
 def welcome(request):

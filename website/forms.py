@@ -172,6 +172,11 @@ class StudentRegisterForm(forms.ModelForm):
         ]
         exclude = ["pfp"]
 
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get('instance', None)
+        self.user = kwargs.pop('user', None)
+        super(StudentRegisterForm, self).__init__(*args, **kwargs)
+
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
 
@@ -183,7 +188,7 @@ class StudentRegisterForm(forms.ModelForm):
         email = self.cleaned_data.get("personal_mail")
 
         if email != "":
-            if Student.objects.filter(personal_mail=email).exists():
+            if Student.objects.filter(personal_mail=email).exclude(user=self.user).exists():
                 raise forms.ValidationError("This email is already used")
         return email
 
@@ -191,7 +196,7 @@ class StudentRegisterForm(forms.ModelForm):
         number = self.cleaned_data.get("phone_number")
 
         if number is not None:
-            if Student.objects.filter(phone_number=number).exists():
+            if Student.objects.filter(phone_number=number).exclude(user=self.user).exists():
                 raise forms.ValidationError("This phone number is already used")
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")
