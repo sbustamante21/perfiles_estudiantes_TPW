@@ -222,7 +222,7 @@ class DegreeFormAdmin(forms.ModelForm):
             "name",
         ]
         
-class SubjectForAdmin(forms.ModelForm):
+class SubjectFormAdmin(forms.ModelForm):
     NUMBER_CHOICES = [
         (1, "1"),
         (2, "2"),

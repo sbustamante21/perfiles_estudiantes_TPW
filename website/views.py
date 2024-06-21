@@ -18,7 +18,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
-    SubjectForAdmin,
+    SubjectFormAdmin,
 )
 from .models import (
     Student,
@@ -62,7 +62,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
-        "curso": SubjectForAdmin,
+        "curso": SubjectFormAdmin,
     }
 
     fields = {
