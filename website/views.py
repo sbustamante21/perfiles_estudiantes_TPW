@@ -18,6 +18,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
+    ContactFormAdmin,
 )
 from .models import (
     Student,
@@ -29,6 +30,7 @@ from .models import (
     History,
     Interest,
     Subject,
+    Contact,
 )
 from django.contrib.auth.views import LogoutView
 
@@ -51,6 +53,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlan,
         "tipo_interes": InterestType,
         "carrera": Degree,
+        "contacto": Contact,
     }
 
     forms = {
@@ -60,6 +63,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
+        "contacto": ContactFormAdmin,
     }
 
     fields = {
@@ -87,6 +91,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
+        "contacto": ["id", "message", "message_type_id", "receiver_id", "sender_id"],
     }
 
     editable_fields = {
@@ -112,6 +117,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
         "carrera": ["name"],
+        "contacto": ["message", "message_type_id", "receiver_id", "sender_id"],
     }
 
     if modelo not in models:
