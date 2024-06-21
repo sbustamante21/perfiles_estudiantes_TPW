@@ -210,11 +210,18 @@ def profile_page(request):
             student_id=user.student,
             interest_type_id=InterestType.objects.get(name="AUXILIO"),
         )
-
+        student_tutor = Interest.objects.filter(
+            student_id=user.student,
+            interest_type_id=InterestType.objects.get(name="TUTORIA"),
+        )
+        student_ayud = Interest.objects.filter(
+            student_id=user.student,
+            interest_type_id=InterestType.objects.get(name="AYUDANTIA"),
+        )
         form = StudentHistory(student_id=user.student)
 
         if request.method == "POST":
-            if "lista_aux" in request.POST or "lista_int" in request.POST:
+            if "lista_aux" in request.POST or "lista_int" in request.POST or "lista_tutor" in request.POST or "lista_ayud" in request.POST:
                 model = Interest
             elif "lista_hist" in request.POST:
                 model = History
@@ -241,6 +248,8 @@ def profile_page(request):
             "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
             "form_history": StudentHistory(student_id=user.student),
             "help_list": student_help,
+            "tutor_list": student_tutor,
+            "ayud_list": student_ayud,
             "interest_fields": ["subject_id"],
             "form_interest": StudentInterest(student_id=user.student),
         }
