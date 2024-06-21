@@ -222,7 +222,19 @@ class DegreeFormAdmin(forms.ModelForm):
             "name",
         ]
 
-
+class InterestFormAdmin(forms.ModelForm):
+    interest_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=True)
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    
+    class Meta:
+        model = Interest
+        fields = [
+            "interest_type_id",
+            "student_id",
+            "subject_id", 
+        ]
+        
 class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)
