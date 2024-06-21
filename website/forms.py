@@ -82,11 +82,30 @@ class UserRegisterForm(UserCreationForm):
             "password2",
         ]
 
+    def __init__(self, *args, **kwargs):
+        # Accept 'instance' keyword argument
+        self.instance = kwargs.get('instance', None)
+        super().__init__(*args, **kwargs)
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        existing_users = User.objects.filter(username=username)
+        if self.instance:
+            existing_users = existing_users.exclude(pk=self.instance.pk)
+        if existing_users.exists():
+            raise forms.ValidationError("This username is already used by another user.")
+        return username
+
     def clean_email(self):
         email = self.cleaned_data.get("email")
 
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("This value already exists.")
+        existing_users = User.objects.filter(email=email)
+        if self.instance:
+            # Exclude the current instance from the existing users
+            existing_users = existing_users.exclude(pk=self.instance.pk)
+        if existing_users.exists():
+            raise forms.ValidationError("Ya se está usando este correo.")
+
         return email
 
 

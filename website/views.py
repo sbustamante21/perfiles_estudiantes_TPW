@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages, auth
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -288,6 +288,57 @@ def delete_user(request):
             user.is_active = False
             user.save()
     return redirect("logout")
+
+def professor_edit(request):
+    user = request.user
+    editable_fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password1",
+            "password2",
+        ]
+
+
+    if request.method == "POST":
+        user_form = UserRegisterForm(request.POST, instance=User.objects.get(id=user.id))
+
+        email = request.POST.get("email")
+
+        if not email.endswith("@utalca.cl"):
+            user_form.add_error("email", "You must use your institution's email.")
+            return render(
+                request,
+                "website/professor_edit.html",
+                {
+                    "user_form": user_form,
+                },
+            )
+
+        if user_form.is_valid():
+            user.role = User.PROFESSOR
+            for field in editable_fields:
+                if field != "password1" and field != "password2":
+                    setattr(user, field, user_form.cleaned_data[field])
+                else:
+                    user.set_password(user_form.cleaned_data["password1"])
+            user.save()
+            if user == request.user:
+                update_session_auth_hash(request, user)
+
+            return redirect(reverse("profile_page"))
+    else:
+        user_form = UserRegisterForm(instance=User.objects.get(id=user.id))
+
+    return render(
+        request,
+        "website/professor_edit.html",
+        {
+            "user_form": user_form,
+        },
+    )
+        
 
 
 def welcome(request):
