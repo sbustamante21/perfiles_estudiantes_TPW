@@ -19,6 +19,8 @@ from .forms import (
     StudentHistory,
     StudentInterest,
     StudentProfilePicture,
+    SubjectFormAdmin,
+    InterestFormAdmin,
 )
 from .models import (
     Student,
@@ -52,6 +54,8 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlan,
         "tipo_interes": InterestType,
         "carrera": Degree,
+        "curso": Subject,
+        "interes": Interest,
     }
 
     forms = {
@@ -61,6 +65,8 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
+        "curso": SubjectFormAdmin,
+        "interes": InterestFormAdmin,
     }
 
     fields = {
@@ -88,6 +94,8 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
+        "curso": ["id", "name", "period", "period_type", "plan_id"],
+        "interes": ["id", "interest_type_id", "student_id", "subject_id"],
     }
 
     editable_fields = {
@@ -113,6 +121,8 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
         "carrera": ["name"],
+        "curso": ["name", "period", "period_type", "plan_id"],
+        "interes": ["interest_type_id", "student_id", "subject_id"]
     }
 
     if modelo not in models:
@@ -217,11 +227,18 @@ def profile_page(request):
             student_id=user.student,
             interest_type_id=InterestType.objects.get(name="AUXILIO"),
         )
-
+        student_tutor = Interest.objects.filter(
+            student_id=user.student,
+            interest_type_id=InterestType.objects.get(name="TUTORIA"),
+        )
+        student_ayud = Interest.objects.filter(
+            student_id=user.student,
+            interest_type_id=InterestType.objects.get(name="AYUDANTIA"),
+        )
         form = StudentHistory(student_id=user.student)
 
         if request.method == "POST":
-            if "lista_aux" in request.POST or "lista_int" in request.POST:
+            if "lista_aux" in request.POST or "lista_int" in request.POST or "lista_tutor" in request.POST or "lista_ayud" in request.POST:
                 model = Interest
             elif "lista_hist" in request.POST:
                 model = History
@@ -259,6 +276,8 @@ def profile_page(request):
             "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
             "form_history": StudentHistory(student_id=user.student),
             "help_list": student_help,
+            "tutor_list": student_tutor,
+            "ayud_list": student_ayud,
             "interest_fields": ["subject_id"],
             "form_interest": StudentInterest(student_id=user.student),
             "pfp_form": StudentProfilePicture(instance=user.student),
