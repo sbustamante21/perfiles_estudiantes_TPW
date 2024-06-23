@@ -278,6 +278,27 @@ class SubjectFormAdmin(forms.ModelForm):
             "plan_id",
         ]
 
+class HistoryFormAdmin(forms.ModelForm):
+    NUMBER_CHOICES = [
+        (1, "1"),
+        (2, "2"),
+    ]
+    year = forms.IntegerField(required=True)
+    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
+    interest_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=True)
+    
+    class Meta:
+        model = History
+        fields = [
+            "year",
+            "period",
+            "interest_type_id",
+            "subject_id",
+            "student_id",
+        ]
+    
 class ContactFormAdmin(forms.ModelForm):
     message = forms.CharField(required=True)
     message_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
