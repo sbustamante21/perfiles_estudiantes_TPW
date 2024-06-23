@@ -5,22 +5,21 @@
 
 
 <div class="container mt-5 pt-5">
-    <h3>hola, {{user.username}}. Has iniciado como {{role}}</h1>
+    <h3>Hola, {{user.username}}! Has iniciado sesión como {{role}}</h1>
 </div>
 
 <section style="background-color: #eee;">
     <div class="container py-5">
-  
-      <div class="row">
+        <div class="row">
         <div class="col-lg-5">
           <div class="card mb-4">
             <div class="card-body text-center">
                 {% if role == "Estudiante" and pfp %}
-                    <img src={{ pfp.url }} alt="avatar"
-                class="rounded-circle img-fluid" style="width: 150px;">
+                  <img src={{ pfp.url }} alt="hola"
+                  class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
                 {% else %}
                     <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
-                class="rounded-circle img-fluid" style="width: 150px;">
+                class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
                 {% endif %}
               <h5 class="my-3">{{user.first_name}} {{user.last_name}}</h5>
               {% if role == "Estudiante"%}
@@ -34,19 +33,28 @@
                   <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
                 {% endif %}
                 <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
+                {% if role == "Docente" %}
+                  <a  href="{% url 'professor_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
+
+                {% elif role == "Estudiante" %}
+                  <a  href="{% url 'student_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
+                {% endif %}
               </div>
             </div>
           </div>
           {% if role == "Estudiante" %}
             <div class="card mb-4 mb-lg-0">
                 <div class="card-body p-0">
-                    <table class="table">
+                  <div class="card-header text-center">
+                    Historial del Estudiante
+                  </div>
+                    <table class="table text-center">
                       <thead>
                         <tr>
                             {% for field in fields %}
                                 <th scope="col">{{ field }}</th>
                             {% endfor %}
-                            <th>Eliminar</th>
+                            <th>eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,7 +68,7 @@
                                       {% csrf_token %}
                                       <input type="hidden" name="lista_hist">
                                       <input type="hidden" name="id" value="{{ his.id }}">
-                                      <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                                      <button class="btn btn-danger" onclick="return confirm('¿Está seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                                   </form>
                               </td>
                           </tr>
@@ -69,8 +77,12 @@
                     </table>
                 </div>
             </div>
-            <div class="container">
-              <div class="card card-body">
+            <br>
+            <div class="card mb-4 mb-lg-0">
+              <div class="card-header text-center">
+                Añadir Historial
+              </div>
+              <div class="card-body">
                   <form method="POST" enctype="multipart/form-data">
                       {% csrf_token %}
                       <input type="hidden" name="lista_hist">
@@ -97,7 +109,7 @@
               <hr>
               <div class="row">
                 <div class="col-sm-3">
-                  <p class="mb-0">Correo institucional</p>
+                  <p class="mb-0">Correo Institucional</p>
                 </div>
                 <div class="col-sm-9">
                   <p class="text-muted mb-0">{{user.email}}</p>
@@ -107,7 +119,7 @@
               <hr>
               <div class="row">
                 <div class="col-sm-3">
-                  <p class="mb-0">Correo personal</p>
+                  <p class="mb-0">Correo Personal</p>
                 </div>
                 <div class="col-sm-9">
                   <p class="text-muted mb-0">{{user.personal_mail}}</p>
@@ -125,7 +137,7 @@
               <hr>
               <div class="row">
                 <div class="col-sm-3">
-                  <p class="mb-0">Año de ingreso</p>
+                  <p class="mb-0">Año de Ingreso</p>
                 </div>
                 <div class="col-sm-9">
                   <p class="text-muted mb-0">{{year}}</p>
@@ -159,7 +171,20 @@
                     <div class="card-body">
                         <p class="mb-4"> OFREZCO TUTORIA DE </p>
                         <ul>
-                            {% comment %} En ciclo, colocar las ayudantias de interes {% endcomment %}
+                          {% for tutor in tutor_list %}
+                            {% for field in interest_fields %}
+                            <li>
+                              {{ tutor|attr:field }}
+                              <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="lista_tutor">
+                                <input type="hidden" name="id" value="{{ tutor.id }}">
+                                <br>
+                                <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
+                            </form>
+                            </li>
+                            {% endfor %}
+                          {% endfor %}
                         </ul>
                     </div>
                 </div>
@@ -169,7 +194,20 @@
                   <div class="card-body">
                       <p class="mb-4">OFREZCO AYUDANTIA DE</p>
                       <ul>
-                          {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                        {% for ayud in ayud_list %}
+                          {% for field in interest_fields %}
+                          <li>
+                            {{ ayud|attr:field }}
+                            <form method="post" style="display:inline;">
+                              {% csrf_token %}
+                              <input type="hidden" name="lista_ayud">
+                              <input type="hidden" name="id" value="{{ ayud.id }}">
+                              <br>
+                              <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
+                          </form>
+                          </li>
+                          {% endfor %}
+                        {% endfor %}
                       </ul>
                   </div>
               </div>
@@ -178,7 +216,6 @@
             <div class="card mb-4 mb-md-0">
               <div class="card-body">
                   <p class="mb-4">NECESITO AUXILIO EN</p>
-      
                   <ul>
                     {% for help in help_list %}
                       {% for field in interest_fields %}
@@ -188,7 +225,8 @@
                           {% csrf_token %}
                           <input type="hidden" name="lista_aux">
                           <input type="hidden" name="id" value="{{ help.id }}">
-                          <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                          <br>
+                          <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                       </form>
                       </li>
                       {% endfor %}
@@ -197,8 +235,13 @@
               </div>
           </div>            
         </div>
-        <div class="container">
-          <div class="card card-body">
+        </div>
+        <br>
+        <div class="card mb-4">
+            <div class="card-header text-center">
+              Añadir ramos para ofrecer o pedir ayuda
+            </div>
+            <div class="card-body">
               <form method="POST" enctype="multipart/form-data">
                   {% csrf_token %}
                   <input type="hidden" name="lista_int">
@@ -207,13 +250,54 @@
                     <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
                   {% endbuttons %}
               </form>
-          </div>
+            </div>
         </div>
         {% endif %}
-    </div>
+      </div>
     </div>
 </div>
 </section>
+
+{% comment %} Modal para la foto de perfil del usuario {% endcomment %}
+<div class="modal fade" 
+         id="pfpmodal" 
+         tabindex="-1" 
+         aria-labelledby="exampleModalLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" 
+                        id="exampleModalLabel">
+                        Modal Title
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close">
+
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="pfp_estudiante">
+                    {% bootstrap_form pfp_form %}
+                    {% buttons %}
+                      <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                    {% endbuttons %}
+                  </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% bootstrap_css %}
 {% bootstrap_javascript %}

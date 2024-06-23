@@ -18,7 +18,7 @@
             {% for obj in objs %}
                 <tr>
                     {% for field in raw_fields %}
-                        <td>{{ obj|attr:field }}</td>
+                        <td>{{ obj|attr:field|display_role:field }}</td>
                     {% endfor %}
                     <td>
                         <form method="post" style="display:inline;">
