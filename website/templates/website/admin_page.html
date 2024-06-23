@@ -5,37 +5,53 @@
 
 <div class="container mt-5 pt-5">
     <h2 class="mt-5 pt-5">Administración para datos de {{ model_name }}</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                {% for field in model_fields %}
-                    <th scope="col">{{ field }}</th>
-                {% endfor %}
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for obj in objs %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
                     {% for field in raw_fields %}
-                        <td>{{ obj|attr:field }}</td>
+                        <td>{{ obj|attr:field|display_role:field }}</td>
                     {% endfor %}
-                    <td>
-                        <form method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="id" value="{{ obj.id }}">
-                            <button class = "btn btn-warning" type="submit" name="editar">Edit</button>
-                        </form>
-                        <form method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="id" value="{{ obj.id }}">
-                            <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
-                        </form>
-                    </td>
+                     <th>Actions</th>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ obj.id }}">
+                                <button class = "btn btn-warning" type="submit" name="editar">Edit</button>
+                            </form>
+                            {% if not obj == request.user %}
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ obj.id }}">
+                                    <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                                </form>
+                            {% endif %}
+                  </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for obj in objs %}
+                    <tr>
+                        {% for field in raw_fields %}
+                            <td>{{ obj|attr:field }}</td>
+                        {% endfor %}
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ obj.id }}">
+                                <button class = "btn btn-warning" type="submit" name="editar">Edit</button>
+                            </form>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ obj.id }}">
+                                <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div class="col">
