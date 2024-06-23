@@ -9,8 +9,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    {% for field in model_fields %}
-                        <th scope="col">{{ field }}</th>
+                    {% for field in raw_fields %}
+                        <td>{{ obj|attr:field|display_role:field }}</td>
                     {% endfor %}
                     <th>Actions</th>
                 </tr>
