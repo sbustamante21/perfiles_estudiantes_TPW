@@ -14,20 +14,12 @@
 <body>
     <nav class="navbar navbar-expand-md bg-success fixed-top mb-5 navbar-dark" data-bs-theme="dark">
         <div class="container-fluid bg-success">
-            {% if request.user.is_authenticated%}
-                {%if request.user.role == user.ADMIN%}
-                    <a class="navbar-brand bg-success text-white" href="{% url 'admin_page' 'estudiante' %}">
-                        <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
-                            alt="logoicb">
-                        <span class="bold-text">LINK ICB</span>
-                    </a>
-                {% else %}
+            {% if request.user.is_authenticated%} 
                 <a class="navbar-brand bg-success text-white" href="{% url 'main_page' %}">
                     <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
                         alt="logoicb">
                     <span class="bold-text">LINK ICB</span>
                 </a>
-                {% endif %}
             {% else %}
                 <a class="navbar-brand bg-success text-white" href="{%url 'welcome'%}">
                     <img src="https://icb.utalca.cl/wp-content/uploads/2020/11/cropped-logo-1.png" width="160" height="55"
@@ -65,6 +57,17 @@
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'usuario' %}">Usuario</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'historial' %}">Historial</a>
+                            </li>
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'contacto' %}">Contacto</a>
+                            </li>
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'curso' %}">Curso</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'interes' %}">Interes</a>
+                            </li>
+                          
                         {% elif request.user.role != user.ADMIN %}
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
