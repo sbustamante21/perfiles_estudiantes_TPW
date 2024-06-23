@@ -18,6 +18,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
+    SubjectFormAdmin,
     InterestFormAdmin,
 )
 from .models import (
@@ -52,6 +53,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlan,
         "tipo_interes": InterestType,
         "carrera": Degree,
+        "curso": Subject,
         "interes": Interest,
     }
 
@@ -62,6 +64,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
+        "curso": SubjectFormAdmin,
         "interes": InterestFormAdmin,
     }
 
@@ -90,6 +93,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
+        "curso": ["id", "name", "period", "period_type", "plan_id"],
         "interes": ["id", "interest_type_id", "student_id", "subject_id"],
     }
 
@@ -116,6 +120,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
         "carrera": ["name"],
+        "curso": ["name", "period", "period_type", "plan_id"],
         "interes": ["interest_type_id", "student_id", "subject_id"]
     }
 
