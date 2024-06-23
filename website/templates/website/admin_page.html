@@ -12,7 +12,21 @@
                     {% for field in raw_fields %}
                         <td>{{ obj|attr:field|display_role:field }}</td>
                     {% endfor %}
-                    <th>Actions</th>
+                     <th>Actions</th>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ obj.id }}">
+                                <button class = "btn btn-warning" type="submit" name="editar">Edit</button>
+                            </form>
+                            {% if not obj == request.user %}
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ obj.id }}">
+                                    <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                                </form>
+                            {% endif %}
+                  </td>
                 </tr>
             </thead>
             <tbody>
