@@ -82,11 +82,30 @@ class UserRegisterForm(UserCreationForm):
             "password2",
         ]
 
+    def __init__(self, *args, **kwargs):
+        # Accept 'instance' keyword argument
+        self.instance = kwargs.get('instance', None)
+        super().__init__(*args, **kwargs)
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        existing_users = User.objects.filter(username=username)
+        if self.instance:
+            existing_users = existing_users.exclude(pk=self.instance.pk)
+        if existing_users.exists():
+            raise forms.ValidationError("This username is already used by another user.")
+        return username
+
     def clean_email(self):
         email = self.cleaned_data.get("email")
 
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("This value already exists.")
+        existing_users = User.objects.filter(email=email)
+        if self.instance:
+            # Exclude the current instance from the existing users
+            existing_users = existing_users.exclude(pk=self.instance.pk)
+        if existing_users.exists():
+            raise forms.ValidationError("Ya se está usando este correo.")
+
         return email
 
 
@@ -153,6 +172,11 @@ class StudentRegisterForm(forms.ModelForm):
         ]
         exclude = ["pfp"]
 
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get('instance', None)
+        self.user = kwargs.pop('user', None)
+        super(StudentRegisterForm, self).__init__(*args, **kwargs)
+
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
 
@@ -164,7 +188,7 @@ class StudentRegisterForm(forms.ModelForm):
         email = self.cleaned_data.get("personal_mail")
 
         if email != "":
-            if Student.objects.filter(personal_mail=email).exists():
+            if Student.objects.filter(personal_mail=email).exclude(user=self.user).exists():
                 raise forms.ValidationError("This email is already used")
         return email
 
@@ -172,11 +196,23 @@ class StudentRegisterForm(forms.ModelForm):
         number = self.cleaned_data.get("phone_number")
 
         if number is not None:
-            if Student.objects.filter(phone_number=number).exists():
+            if Student.objects.filter(phone_number=number).exclude(user=self.user).exists():
                 raise forms.ValidationError("This phone number is already used")
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")
         return number
+
+class StudentProfilePicture(forms.ModelForm):
+    pfp = forms.ImageField(required=False)
+
+    class Meta:
+        model = Student
+        fields = ["pfp"]
+    
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get('instance', None)
+        super(StudentProfilePicture, self).__init__(*args, **kwargs)
+
 
 
 class PeriodTypeFormAdmin(forms.ModelForm):
@@ -305,7 +341,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
         if number is not None:
             if (
                 Student.objects.filter(phone_number=number).exists()
-                and self.instance.number != number
+                and self.instance.phone_number != number
             ):
                 raise forms.ValidationError("This phone number is already used")
             elif len(str(number)) != 9:
