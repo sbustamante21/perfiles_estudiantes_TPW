@@ -18,6 +18,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
+    ContactFormAdmin,
     StudentProfilePicture,
     SubjectFormAdmin,
     InterestFormAdmin,
@@ -32,6 +33,7 @@ from .models import (
     History,
     Interest,
     Subject,
+    Contact,
 )
 from django.contrib.auth.views import LogoutView
 
@@ -54,6 +56,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlan,
         "tipo_interes": InterestType,
         "carrera": Degree,
+        "contacto": Contact,
         "curso": Subject,
         "interes": Interest,
     }
@@ -65,6 +68,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
+        "contacto": ContactFormAdmin,
         "curso": SubjectFormAdmin,
         "interes": InterestFormAdmin,
     }
@@ -94,6 +98,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
+        "contacto": ["id", "message", "message_type_id", "receiver_id", "sender_id"],
         "curso": ["id", "name", "period", "period_type", "plan_id"],
         "interes": ["id", "interest_type_id", "student_id", "subject_id"],
     }
@@ -121,6 +126,7 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
         "carrera": ["name"],
+        "contacto": ["message", "message_type_id", "receiver_id", "sender_id"],
         "curso": ["name", "period", "period_type", "plan_id"],
         "interes": ["interest_type_id", "student_id", "subject_id"]
     }

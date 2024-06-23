@@ -10,6 +10,7 @@ from .models import (
     History,
     Subject,
     Interest,
+    Contact,
 )
 from django.core.validators import MaxValueValidator
 import datetime
@@ -275,6 +276,21 @@ class SubjectFormAdmin(forms.ModelForm):
             "period",
             "period_type",
             "plan_id",
+        ]
+
+class ContactFormAdmin(forms.ModelForm):
+    message = forms.CharField(required=True)
+    message_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
+    sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
+    
+    class Meta:
+        model = Contact
+        fields = [
+            "message",
+            "message_type_id",
+            "receiver_id",
+            "sender_id",
         ]
 
 class InterestFormAdmin(forms.ModelForm):
