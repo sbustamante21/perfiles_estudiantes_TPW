@@ -14,4 +14,6 @@ urlpatterns = [
     path("delete_user/", views.delete_user, name="delete_user"),
     path("admin_page/<str:modelo>/", views.admin_page, name="admin_page"),
     path("profile_page/", views.profile_page, name="profile_page"),
+    path("professor_edit/", views.professor_edit, name="professor_edit"),
+    path("student_edit/", views.student_edit, name="student_edit"),
 ]

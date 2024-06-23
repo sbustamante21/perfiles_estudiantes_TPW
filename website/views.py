@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages, auth
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
@@ -18,6 +18,11 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
+    HistoryFormAdmin
+    ContactFormAdmin,
+    StudentProfilePicture,
+    SubjectFormAdmin,
+    InterestFormAdmin,
 )
 from .models import (
     Student,
@@ -29,7 +34,10 @@ from .models import (
     History,
     Interest,
     Subject,
+    Contact,
 )
+
+from .decorators import role_required
 from django.contrib.auth.views import LogoutView
 
 # Create your views here.
@@ -41,7 +49,7 @@ def main_page(request):
     return render(request, "website/main_page.html", {})
 
 
-@login_required
+@role_required([User.ADMIN])
 def admin_page(request, modelo=None):
 
     models = {
@@ -51,6 +59,10 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlan,
         "tipo_interes": InterestType,
         "carrera": Degree,
+        "historial": History,
+        "contacto": Contact,
+        "curso": Subject,
+        "interes": Interest,
     }
 
     forms = {
@@ -60,6 +72,10 @@ def admin_page(request, modelo=None):
         "plan_curricular": CurriculumPlanFormAdmin,
         "tipo_interes": InterestTypeFormAdmin,
         "carrera": DegreeFormAdmin,
+        "historial": HistoryFormAdmin,
+        "contacto": ContactFormAdmin,
+        "curso": SubjectFormAdmin,
+        "interes": InterestFormAdmin,
     }
 
     fields = {
@@ -87,6 +103,10 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
+        "historial": ["id", "year", "period", "interest_type_id", "subject_id", "student_id"],
+        "contacto": ["id", "message", "message_type_id", "receiver_id", "sender_id"],
+        "curso": ["id", "name", "period", "period_type", "plan_id"],
+        "interes": ["id", "interest_type_id", "student_id", "subject_id"],
     }
 
     editable_fields = {
@@ -112,6 +132,10 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["name", "impl_year", "degree_id"],
         "tipo_interes": ["name"],
         "carrera": ["name"],
+        "historial": ["year", "period", "interest_type_id", "subject_id", "student_id"],
+        "contacto": ["message", "message_type_id", "receiver_id", "sender_id"],
+        "curso": ["name", "period", "period_type", "plan_id"],
+        "interes": ["interest_type_id", "student_id", "subject_id"]
     }
 
     if modelo not in models:
@@ -148,10 +172,15 @@ def admin_page(request, modelo=None):
                 form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
-                        if field != "password":
+                        if field != "password" and field != "pfp":
                             setattr(obj, field, form.cleaned_data[field])
-                        else:
+                        elif field == "password":
                             obj.set_password(form.cleaned_data[field])
+                        elif field == "pfp":
+                            if form.cleaned_data.get("pfp") is False:
+                                setattr(obj, field, None)
+                            else:
+                                setattr(obj, field, form.cleaned_data[field])
                     obj.save()
                     editing = False
                     form = form_model()
@@ -197,9 +226,10 @@ def do_login(request):
         return render(request, "website/login.html", {"form": form})
 
 
-@login_required
+@role_required([User.PROFESSOR, User.STUDENT])
 def profile_page(request):
     user = request.user
+    print(user.student)
     if user.role == user.STUDENT:
         degree = user.student.degree_id
         adm_year = user.student.admission_year
@@ -210,11 +240,18 @@ def profile_page(request):
             student_id=user.student,
             interest_type_id=InterestType.objects.get(name="AUXILIO"),
         )
-
+        student_tutor = Interest.objects.filter(
+            student_id=user.student,
+            interest_type_id=InterestType.objects.get(name="TUTORIA"),
+        )
+        student_ayud = Interest.objects.filter(
+            student_id=user.student,
+            interest_type_id=InterestType.objects.get(name="AYUDANTIA"),
+        )
         form = StudentHistory(student_id=user.student)
 
         if request.method == "POST":
-            if "lista_aux" in request.POST or "lista_int" in request.POST:
+            if "lista_aux" in request.POST or "lista_int" in request.POST or "lista_tutor" in request.POST or "lista_ayud" in request.POST:
                 model = Interest
             elif "lista_hist" in request.POST:
                 model = History
@@ -225,9 +262,20 @@ def profile_page(request):
                     form = StudentHistory(request.POST, student_id=user.student)
                 elif "lista_int" in request.POST:
                     form = StudentInterest(request.POST, student_id=user.student)
-                if form.is_valid():
+                elif "pfp_estudiante" in request.POST:
+                    form = StudentProfilePicture(request.POST, request.FILES, instance=user.student)
+                if form.is_valid() and not "pfp_estudiante" in request.POST:
                     form.save()
-                    form = model(student_id=user.student)
+                    #form = model(student_id=user.student) # ????
+                else:
+                    if form.is_valid():
+                        if form.cleaned_data.get("pfp") is False:
+                            user.student.pfp = None
+                        else:
+                            user.student.pfp = form.cleaned_data["pfp"]
+
+                        user.student.save()
+                        return redirect("profile_page")
 
         context = {
             "user": user,
@@ -241,9 +289,13 @@ def profile_page(request):
             "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
             "form_history": StudentHistory(student_id=user.student),
             "help_list": student_help,
+            "tutor_list": student_tutor,
+            "ayud_list": student_ayud,
             "interest_fields": ["subject_id"],
             "form_interest": StudentInterest(student_id=user.student),
+            "pfp_form": StudentProfilePicture(instance=user.student),
         }
+
     elif user.role == user.PROFESSOR:
         context = {"user": user, "role": "Docente"}
 
@@ -288,6 +340,129 @@ def delete_user(request):
             user.is_active = False
             user.save()
     return redirect("logout")
+
+def professor_edit(request):
+    user = request.user
+    editable_fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password1",
+            "password2",
+        ]
+
+
+    if request.method == "POST":
+        user_form = UserRegisterForm(request.POST, instance=User.objects.get(id=user.id))
+
+        email = request.POST.get("email")
+
+        if not email.endswith("@utalca.cl"):
+            user_form.add_error("email", "You must use your institution's email.")
+            return render(
+                request,
+                "website/professor_edit.html",
+                {
+                    "user_form": user_form,
+                },
+            )
+
+        if user_form.is_valid():
+            user.role = User.PROFESSOR
+            for field in editable_fields:
+                if field != "password1" and field != "password2":
+                    setattr(user, field, user_form.cleaned_data[field])
+                else:
+                    user.set_password(user_form.cleaned_data["password1"])
+            user.save()
+            if user == request.user:
+                update_session_auth_hash(request, user)
+
+            return redirect(reverse("profile_page"))
+    else:
+        user_form = UserRegisterForm(instance=User.objects.get(id=user.id))
+
+    return render(
+        request,
+        "website/professor_edit.html",
+        {
+            "user_form": user_form,
+        },
+    )
+
+def student_edit(request):
+
+    user = request.user
+    student = user.student
+
+    student_editable_fields = [
+            "admission_year",
+            "personal_mail",
+            "phone_number",
+            "degree_id",
+            "curriculum_plan_id",
+        ]
+
+    user_editable_fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password1",
+            "password2",
+        ]
+
+    if request.method == "POST":
+        user_form = UserRegisterForm(request.POST, instance=user)
+        student_form = StudentRegisterForm(request.POST, request.FILES, instance=student, user=user)
+
+        email = request.POST.get("email")
+
+        if not email.endswith("@alumnos.utalca.cl"):
+            user_form.add_error("email", "You must use your institution's email.")
+            return render(
+                request,
+                "website/student_edit.html",
+                {
+                    "user_form": user_form,
+                    "student_form": student_form,
+                },
+            )
+
+        if user_form.is_valid() and student_form.is_valid():
+            user.role = User.STUDENT
+
+            for field in user_editable_fields:
+                if field != "password1" and field != "password2":
+                    setattr(user, field, user_form.cleaned_data[field])
+                else:
+                    user.set_password(user_form.cleaned_data["password1"])
+            user.save()
+            
+            for field in student_editable_fields:
+                setattr(student, field, student_form.cleaned_data[field])
+            student.user = user
+
+            student.save()
+
+            if user == request.user:
+                update_session_auth_hash(request, user)
+
+            return redirect(reverse("profile_page"))
+
+    else:
+        user_form = UserRegisterForm(instance=user)
+        student_form = StudentRegisterForm(instance=student, user=user)
+
+    return render(
+        request,
+        "website/student_edit.html",
+        {
+            "user_form": user_form,
+            "student_form": student_form,
+        },
+    )
 
 
 def welcome(request):
