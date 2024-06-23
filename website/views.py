@@ -5,6 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import JsonResponse
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
 from .forms import (
     StudentRegisterForm,
@@ -550,3 +554,72 @@ def professor_register(request):
             "user_form": user_form,
         },
     )
+
+def generate_pdf(request):
+    user = request.user
+    student = user.student
+
+    # ¿Que se puede poner en el pdf?
+    # Historial
+    # Intereses de ayudantias, tutorias y ramos
+    # Cuando se unio la persona a la app?
+    # Nombre y sus datos personales
+    # Foto de perfil
+
+    # Pasarla al context y luego mostrarla en el pdf
+
+    degree = user.student.degree_id
+    adm_year = user.student.admission_year
+    pfp = user.student.pfp
+    cplan = user.student.curriculum_plan_id
+    student_history = History.objects.filter(student_id=user.student)
+
+    student_tutor = Interest.objects.filter(
+        student_id=user.student,
+        interest_type_id=InterestType.objects.get(name="TUTORIA"),
+    )
+
+    student_help = Interest.objects.filter(
+        student_id=user.student,
+        interest_type_id=InterestType.objects.get(name="AUXILIO"),
+    )
+
+    student_ayud = Interest.objects.filter(
+        student_id=user.student,
+        interest_type_id=InterestType.objects.get(name="AYUDANTIA"),
+    )
+
+    context = {
+            "user": user,
+            "role": "Estudiante",
+            "degree": degree,
+            "year": adm_year,
+            "pfp": pfp,
+            "cplan": cplan,
+            "history": student_history,
+            "fields": ["año", "periodo", "ramo", "tipo"],
+            "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
+            "form_history": StudentHistory(student_id=user.student),
+            "help_list": student_help,
+            "interest_fields": ["subject_id"],
+            "form_interest": StudentInterest(student_id=user.student),
+    }
+
+    pdf = render_to_pdf('website/curriculum.html', context)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="curriculum.pdf"'
+        return response
+    return HttpResponse("Error generating PDF")
+
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+
+

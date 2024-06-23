@@ -31,6 +31,7 @@
               <div class="d-flex justify-content-center mb-2">
                 {% if role == "Estudiante" %}
                   <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
+                  <a  href="{% url 'generate_pdf' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar curriculum</a>
                 {% endif %}
                 <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
                 {% if role == "Docente" %}

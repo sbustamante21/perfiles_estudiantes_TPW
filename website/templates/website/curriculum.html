@@ -1,0 +1,160 @@
+{% load bootstrap5 %}
+{% block content %}
+{% load website_filters %}
+
+<section style="background-color: #eee;">
+    <div class="container py-5">
+  
+      <div class="row">
+        <div class="col-lg-5">
+          <div class="card mb-4">
+            <div class="card-body text-center">
+                {% if pfp %}
+                    <img src={{ pfp.url }} alt="avatar"
+                class="rounded-circle img-fluid" style="width: 150px;">
+                {% else %}
+                    <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
+                class="rounded-circle img-fluid" style="width: 150px;">
+                {% endif %}
+              <h5 class="my-3">{{user.first_name}} {{user.last_name}}</h5>
+                <p class="text-muted mb-1">{{role}} de {{degree}}</p>
+              <p class="text-muted mb-4">Universidad de Talca</p>
+            </div>
+          </div>
+            <div class="card mb-4 mb-lg-0">
+                <div class="card-body p-0">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                            {% for field in fields %}
+                                <th scope="col">{{ field }}</th>
+                            {% endfor %}
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% for his in history %}
+                          <tr>
+                              {% for field in raw_fields %}
+                                  <td>{{ his|attr:field }}</td>
+                              {% endfor %}
+                          </tr>
+                      {% endfor %}
+                  </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Nombre</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.first_name}} {{user.last_name}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Correo institucional</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.email}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Correo personal</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.personal_mail}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Celular</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.phone_number}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Año de ingreso</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{year}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Carrera</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{degree}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Plan Curricular</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{cplan}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4 mb-md-0">
+                    <div class="card-body">
+                        <p class="mb-4"> OFREZCO TUTORIA DE </p>
+                        <ul>
+                            {% comment %} En ciclo, colocar las ayudantias de interes {% endcomment %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4 mb-md-0">
+                  <div class="card-body">
+                      <p class="mb-4">OFREZCO AYUDANTIA DE</p>
+                      <ul>
+                          {% comment %} en ciclo, colocar las tutorias de interes {% endcomment %}
+                      </ul>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4 mb-md-0">
+              <div class="card-body">
+                  <p class="mb-4">NECESITO AUXILIO EN</p>
+      
+                  <ul>
+                    {% for help in help_list %}
+                      {% for field in interest_fields %}
+                      <li>
+                        {{ help|attr:field }}
+                      </li>
+                      {% endfor %}
+                    {% endfor %}
+                  </ul>
+              </div>
+          </div>            
+        </div>
+    </div>
+    </div>
+</div>
+</section>
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% endblock content %}
