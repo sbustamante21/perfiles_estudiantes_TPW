@@ -22,7 +22,7 @@ from .forms import (
     UserRegisterFormAdmin,
     StudentHistory,
     StudentInterest,
-    HistoryFormAdmin
+    HistoryFormAdmin,
     ContactFormAdmin,
     StudentProfilePicture,
     SubjectFormAdmin,
@@ -233,7 +233,6 @@ def do_login(request):
 @role_required([User.PROFESSOR, User.STUDENT])
 def profile_page(request):
     user = request.user
-    print(user.student)
     if user.role == user.STUDENT:
         degree = user.student.degree_id
         adm_year = user.student.admission_year
@@ -601,6 +600,8 @@ def generate_pdf(request):
             "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
             "form_history": StudentHistory(student_id=user.student),
             "help_list": student_help,
+            "tutor_list": student_tutor,
+            "ayud_list": student_ayud, 
             "interest_fields": ["subject_id"],
             "form_interest": StudentInterest(student_id=user.student),
     }
