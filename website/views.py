@@ -106,7 +106,7 @@ def main_page(request):
             if message_form.is_valid():
                 int_type = message_form.cleaned_data.get("interest_type")
 
-                if int_type == "AUXILIO":
+                if int_type.name == "AUXILIO":
                     action = "necesito"
                 else:
                     action = "ofrezco"
