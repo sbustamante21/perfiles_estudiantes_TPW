@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
+from django.db.models import Q, Subquery, OuterRef
+from django.core.mail import send_mail
 from .forms import (
     StudentRegisterForm,
     UserRegisterForm,
@@ -27,6 +29,8 @@ from .forms import (
     StudentProfilePicture,
     SubjectFormAdmin,
     InterestFormAdmin,
+    SearchForm,
+    MessageForm,
 )
 from .models import (
     Student,
@@ -41,6 +45,7 @@ from .models import (
     Contact,
 )
 
+from math import ceil
 from .decorators import role_required
 from django.contrib.auth.views import LogoutView
 
@@ -50,7 +55,80 @@ from django.contrib.auth.views import LogoutView
 # Views
 @login_required
 def main_page(request):
-    return render(request, "website/main_page.html", {})
+
+    students = Student.objects.all()
+    interests = Interest.objects.all()
+    form = SearchForm()
+    message_form = MessageForm()
+
+    if request.method == "POST":
+        if "search_form" in request.POST:
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get("name")
+                subj = form.cleaned_data.get("subject")
+                interest_type = form.cleaned_data.get("interest_type")
+
+                # Se completa nombre pero no intereses
+                if name and not interest_type and not subj:
+                    students = students.filter(
+                        Q(user__first_name__icontains=name) |
+                        Q(user__last_name__icontains=name)
+                    )
+                
+                # Se completan solo intereses pero no nombres
+                elif not name and interest_type and subj:
+                    interests = Interest.objects.filter(
+                        interest_type_id=interest_type,
+                        subject_id=subj
+                    ).values('student_id')
+                    students = students.filter(id__in=Subquery(interests))
+
+                # Se completa solo el interes
+                elif not name and not subj and interest_type:
+                    interests = Interest.objects.filter(
+                        interest_type_id=interest_type,
+                    ).values('student_id')
+                    students = students.filter(id__in=Subquery(interests))
+
+                # Se completa nombre e intereses
+                elif name and interest_type and subj:
+                    interests = Interest.objects.filter(
+                        interest_type=interest_type,
+                        subject=subj
+                    ).values('student_id')
+                    
+                    students = students.filter((Q(user__first_name__icontains=name) | Q(user__last_name__icontains=name)) & Q(id__in=Subquery(interests)))
+        
+        elif "message_form" in request.POST:
+            receiver = User.objects.get(id=request.POST.get("id_receiver"))
+            message_form = MessageForm(request.POST)
+            if message_form.is_valid():
+                int_type = message_form.cleaned_data.get("interest_type")
+
+                if int_type == "AUXILIO":
+                    action = "necesito"
+                else:
+                    action = "ofrezco"
+
+                subj = message_form.cleaned_data.get("subject")
+                title = f"Contacto sobre {int_type} de {subj}"
+                message = f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
+                message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
+                message +=  "\n" + "Este es un mensaje autogenerado por LINK-ICB."
+                sender_email = "sebastian.bustamante.2k3@gmail.com"
+                receiver_email = [receiver.email]
+
+                send_mail(title, message, sender_email, receiver_email)
+
+                # Guardar en la tabla de contacto la interaccion
+                new_contact = Contact(message=message, message_type_id=int_type, subject_id=subj, receiver_id=receiver, sender_id=request.user)
+                new_contact.save()
+                
+    nrows = ceil(len(students)/3)
+    context = {"search_form": form, "students":students, "cant":len(students),"nrows":[i for i in range(nrows)], "message_form":message_form}
+
+    return render(request, "website/main_page.html", context)
 
 
 @role_required([User.ADMIN])
@@ -108,7 +186,7 @@ def admin_page(request, modelo=None):
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
         "historial": ["id", "year", "period", "interest_type_id", "subject_id", "student_id"],
-        "contacto": ["id", "message", "message_type_id", "receiver_id", "sender_id"],
+        "contacto": ["id", "message", "message_type_id", "receiver_id", "sender_id", "subject_id"],
         "curso": ["id", "name", "period", "period_type", "plan_id"],
         "interes": ["id", "interest_type_id", "student_id", "subject_id"],
     }
@@ -137,7 +215,7 @@ def admin_page(request, modelo=None):
         "tipo_interes": ["name"],
         "carrera": ["name"],
         "historial": ["year", "period", "interest_type_id", "subject_id", "student_id"],
-        "contacto": ["message", "message_type_id", "receiver_id", "sender_id"],
+        "contacto": ["message", "message_type_id", "receiver_id", "sender_id", "subject_id"],
         "curso": ["name", "period", "period_type", "plan_id"],
         "interes": ["interest_type_id", "student_id", "subject_id"]
     }
@@ -204,6 +282,7 @@ def admin_page(request, modelo=None):
         "id": id,
         "raw_fields": all_field_names,
     }
+
     return render(request, "website/admin_page.html", context)
 
 

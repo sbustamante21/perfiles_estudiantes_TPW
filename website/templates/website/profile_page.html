@@ -29,10 +29,10 @@
               {% endif %}
               <p class="text-muted mb-4">Universidad de Talca</p>
               <div class="d-flex justify-content-center mb-2">
-                {% if role == "Estudiante" %}
+                {% if role == "Estudiante" and user != request.user %}
                   <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
-                  <a  href="{% url 'generate_pdf' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar curriculum</a>
                 {% endif %}
+                <a  href="{% url 'generate_pdf' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar curriculum</a>
                 <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
                 {% if role == "Docente" %}
                   <a  href="{% url 'professor_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
@@ -260,7 +260,7 @@
 </section>
 
 {% comment %} Modal para la foto de perfil del usuario {% endcomment %}
-{%if Role == "Estudiante" %}
+{%if role == "Estudiante" %}
 <div class="modal fade" 
          id="pfpmodal" 
          tabindex="-1" 
@@ -271,7 +271,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" 
                         id="exampleModalLabel">
-                        Modal Title
+                        Foto de Perfil
                     </h5>
                     <button type="button" 
                             class="btn-close" 
@@ -294,7 +294,7 @@
                     <button type="button" 
                             class="btn btn-secondary" 
                             data-bs-dismiss="modal">
-                        Close
+                        Cerrar
                     </button>
                 </div>
             </div>

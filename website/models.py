@@ -38,17 +38,6 @@ class InterestType(models.Model):
         return self.name
 
 
-class Contact(models.Model):
-    message = models.CharField(max_length=500, default="SAMPLE MESSAGE")
-    message_type_id = models.ForeignKey(InterestType, on_delete=models.CASCADE)
-    receiver_id = models.ForeignKey(
-        User, related_name="receiver", on_delete=models.CASCADE
-    )
-    sender_id = models.ForeignKey(
-        User, related_name="sender", on_delete=models.CASCADE
-    )
-
-
 class Degree(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -107,3 +96,15 @@ class History(models.Model):
     interest_type_id = models.ForeignKey(InterestType, on_delete=models.CASCADE)
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+class Contact(models.Model):
+    message = models.CharField(max_length=500, default="SAMPLE MESSAGE")
+    message_type_id = models.ForeignKey(InterestType, on_delete=models.CASCADE)
+    receiver_id = models.ForeignKey(
+        User, related_name="receiver", on_delete=models.CASCADE
+    )
+    sender_id = models.ForeignKey(
+        User, related_name="sender", on_delete=models.CASCADE
+    )
+    # Nuevo, el ramo comunicado
+    subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, default="")

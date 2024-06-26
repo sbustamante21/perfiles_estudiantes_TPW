@@ -300,11 +300,19 @@ class HistoryFormAdmin(forms.ModelForm):
         ]
     
 class ContactFormAdmin(forms.ModelForm):
-    message = forms.CharField(required=True)
+    
+    HELP_CHOICES = [
+        ('option1', 'Una ayuda, por favor!'),
+        ('option2', 'Necesito ayuda con esto'),
+        ('option3', 'Me ayudas?'),
+    ]
+
+    message = forms.ChoiceField(choices=HELP_CHOICES, widget=forms.RadioSelect, required=True)
     message_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
     receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
     sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+
     class Meta:
         model = Contact
         fields = [
@@ -312,6 +320,7 @@ class ContactFormAdmin(forms.ModelForm):
             "message_type_id",
             "receiver_id",
             "sender_id",
+            "subject_id",
         ]
 
 class InterestFormAdmin(forms.ModelForm):
@@ -411,3 +420,19 @@ class StudentInterest(forms.ModelForm):
         super(StudentInterest, self).__init__(*args, **kwargs)
         if student_id:
             self.fields["student_id"].initial = student_id
+
+class SearchForm(forms.Form):
+    name = forms.CharField(max_length=100, required=False, label='Nombre')
+    interest_type = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=False)
+    subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
+    # se pueden agregar mas filtros...
+
+class MessageForm(forms.Form):
+    HELP_CHOICES = [
+        ('option1', 'Una ayuda, por favor!'),
+        ('option2', 'Necesito ayuda con esto'),
+        ('option3', 'Me ayudas?'),
+    ]
+    subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    interest_type = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+
