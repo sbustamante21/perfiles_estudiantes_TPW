@@ -1,6 +1,117 @@
 {% extends 'base.html' %}
+{% load bootstrap5 %}
 {% block content %}
+{% load website_filters %}
+
 <div class="container mt-5 pt-5">
-  <h1>sample</h1>
+  <div class="row">
+    <div class="col-2">
+      <div class="card">
+        <div class="card-header">
+          <h4>Búsqueda</h4>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form search_form %}
+            <input type="hidden" name="search_form">
+            {% buttons %}
+              <button class="btn btn-primary" type="submit">Buscar</button>
+            {% endbuttons %}
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-10">
+      <div class="table-responsive">
+        <div class="table">
+          <thead>
+            <h2>Se han encontrado {{cant}} estudiantes </h2>
+          </thead>
+          <tbody>
+            {%for student in students%}
+              <tr>
+                <td>
+                  <div class="card">
+                    {% comment %} <h4>{{student.pfp}}</h4> {% endcomment %}
+                     <div class="card-body">
+                      <h4>{{student.user.username}}</h4>
+                      {% if student.pfp %}
+                      <a href="{%url 'profile_page' student.user.id %}">
+                        <img src={{ student.pfp.url }} alt="hola"
+                        class="rounded-circle img-fluid" style="width: 150px;">
+                      </a>
+                      {% else %}
+                      <a href="{%url 'profile_page' student.user.id %}">
+                        <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
+                        class="rounded-circle img-fluid" style="width: 150px;">
+                      </a>
+                      {% endif %}
+                     </div>
+                     <div class="card-footer">
+                      {%if student.user != request.user%}
+                        <input type="hidden" name="id_receiver" id="receiver_input_hidden" value="{{student.user.id}}">
+                        <button type="button" onclick="setReceiverId('{{ student.user.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">Mensaje</button>
+                      {%endif%}
+                     </div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="modal fade" 
+         id="contactmodal" 
+         tabindex="-1" 
+         aria-labelledby="exampleModalLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" 
+                        id="exampleModalLabel">
+                        Contacto
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close">
+
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% bootstrap_form message_form %}
+                    <input type="hidden" name="message_form">
+                    <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
+                    {% buttons %}
+                      <button class="btn btn-primary" type="submit" name="guardar">Enviar</button>
+                    {% endbuttons %}
+                  </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+  function setReceiverId(userId) {
+    document.getElementById('receiver_in_modal').value = userId;
+}
+</script>
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 {% endblock %}

@@ -33,12 +33,19 @@
                   <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
                   <a  href="{% url 'generate_pdf' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-success ms-1">Generar currículum</a>
                 {% endif %}
+                {% if role == "Estudiante" and user != request.user %}
+                <button type="button" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">Mensaje</button>
+                {% endif %}
+                {%if role == "Estudiante"%}
+                <a  href="{% url 'generate_pdf' user.id %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar curriculum</a>
+                {%endif%}
+                {% if user == request.user%}
                 <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
+                {% endif %}
                 {% if role == "Docente" %}
-                  <a  href="{% url 'professor_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-secondary ms-1">Editar perfil</a>
-
-                {% elif role == "Estudiante" %}
-                  <a  href="{% url 'student_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-secondary ms-1">Editar perfil</a>
+                  <a  href="{% url 'professor_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
+                {% elif role == "Estudiante" and user == request.user %}
+                  <a  href="{% url 'student_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
                 {% endif %}
               </div>
             </div>
@@ -66,12 +73,14 @@
                                   <td>{{ his|attr:field }}</td>
                               {% endfor %}
                               <td>
+                                {%if user == request.user%}
                                   <form method="post" style="display:inline;">
                                       {% csrf_token %}
                                       <input type="hidden" name="lista_hist">
                                       <input type="hidden" name="id" value="{{ his.id }}">
                                       <button class="btn btn-danger" onclick="return confirm('¿Está seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                                   </form>
+                                {% endif %}
                               </td>
                           </tr>
                       {% endfor %}
@@ -83,7 +92,23 @@
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#historialmodal">
               Editar historial
             </button>
-
+            {%if user == request.user%}
+            <div class="card mb-4 mb-lg-0">
+              <div class="card-header text-center">
+                Añadir Historial
+              </div>
+              <div class="card-body">
+                  <form method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input type="hidden" name="lista_hist">
+                      {% bootstrap_form form_history %}
+                      {% buttons %}
+                        <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                      {% endbuttons %}
+                  </form>
+              </div>
+            </div>
+            {%endif%}
           {% endif %}
         </div>
         <div class="col-lg-7">
@@ -169,12 +194,14 @@
                             {% for field in interest_fields %}
                             <li>
                               {{ tutor|attr:field }}
+                              {%if user == request.user%}
                               <form method="post" style="display:inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="lista_tutor">
                                 <input type="hidden" name="id" value="{{ tutor.id }}">
                                 <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                               </form>
+                              {%endif%}
                             </li>
                             {% endfor %}
                           {% endfor %}
@@ -194,12 +221,14 @@
                           {% for field in interest_fields %}
                           <li>
                             {{ ayud|attr:field }}
+                            {%if user == request.user%}
                             <form method="post" style="display:inline;">
                               {% csrf_token %}
                               <input type="hidden" name="lista_ayud">
                               <input type="hidden" name="id" value="{{ ayud.id }}">
                               <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
-                          </form>
+                            </form>
+                            {%endif%}
                           </li>
                           {% endfor %}
                         {% endfor %}
@@ -219,12 +248,14 @@
                       {% for field in interest_fields %}
                       <li>
                         {{ help|attr:field }}
+                        {%if user == request.user%}
                         <form method="post" style="display:inline;">
                           {% csrf_token %}
                           <input type="hidden" name="lista_aux">
                           <input type="hidden" name="id" value="{{ help.id }}">
                           <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
-                      </form>
+                        </form>
+                        {%endif%}
                       </li>
                       {% endfor %}
                     {% endfor %}
@@ -238,41 +269,35 @@
           Añadir o eliminar ramos
         </button>
 
+              </div>
+          </div>            
+        </div>
+        </div>
+        <br>
+        {%if user == request.user%}
+        <div class="card mb-4">
+            <div class="card-header text-center">
+              Añadir ramos para ofrecer o pedir ayuda
+            </div>
+            <div class="card-body">
+              <form method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <input type="hidden" name="lista_int">
+                  {% bootstrap_form form_interest %}
+                  {% buttons %}
+                    <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                  {% endbuttons %}
+              </form>
+            </div>
+        </div>
+        {%endif%}
         {% endif %}
       </div>
     </div>
 </div>
 </section>
 
-{% comment %} Modal para la foto de perfil del usuario {% endcomment %}
-{%if role == "Estudiante" %}
-<div class="modal fade" id="pfpmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">
-          EDITAR FOTO DE PERFIL
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          <input type="hidden" name="pfp_estudiante">
-            {% bootstrap_form pfp_form %}
-            {% buttons %}
-          <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
-          {% endbuttons %}
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+{%if role == "Estudiante" and user == request.user %}
 
 <div class="modal fade" id="historialmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -326,27 +351,92 @@
           Cerrar
         </button>
       </div>
+<div class="modal fade" 
+         id="pfpmodal" 
+         tabindex="-1" 
+         aria-labelledby="exampleModalLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" 
+                        id="exampleModalLabel">
+                        EDITAR FOTO DE PERFIL
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close">
+
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="pfp_estudiante">
+                    {% bootstrap_form pfp_form %}
+                    {% buttons %}
+                      <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                    {% endbuttons %}
+                  </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </div>
 {% endif %}
 
+{%if role == "Estudiante"%}
+<div class="modal fade" 
+         id="contactmodal" 
+         tabindex="-1" 
+         aria-labelledby="exampleModalLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" 
+                        id="exampleModalLabel">
+                        Contacto
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close">
+
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% bootstrap_form message_form %}
+                    <input type="hidden" name="message_form">
+                    <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="{{ user.id }}">
+                    {% buttons %}
+                      <button class="btn btn-primary" type="submit" name="guardar">Enviar</button>
+                    {% endbuttons %}
+                  </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+</div>
+{%endif%}
+
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 {% endblock content %}
-
-<div class="card mb-4">
-  <div class="card-header text-center">
-    Añadir ramos para ofrecer o pedir ayuda
-  </div>
-  <div class="card-body">
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="hidden" name="lista_int">
-        {% bootstrap_form form_interest %}
-        {% buttons %}
-          <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
-        {% endbuttons %}
-    </form>
-  </div>
-</div>

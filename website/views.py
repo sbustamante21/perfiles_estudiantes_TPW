@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
+from django.db.models import Q, Subquery, OuterRef
+from django.core.mail import send_mail
 from .forms import (
     StudentRegisterForm,
     UserRegisterForm,
@@ -27,6 +29,8 @@ from .forms import (
     StudentProfilePicture,
     SubjectFormAdmin,
     InterestFormAdmin,
+    SearchForm,
+    MessageForm,
 )
 from .models import (
     Student,
@@ -41,6 +45,7 @@ from .models import (
     Contact,
 )
 
+from math import ceil
 from .decorators import role_required
 from django.contrib.auth.views import LogoutView
 
@@ -50,7 +55,102 @@ from django.contrib.auth.views import LogoutView
 # Views
 @login_required
 def main_page(request):
-    return render(request, "website/main_page.html", {})
+
+    students = Student.objects.all()
+    interests = Interest.objects.all()
+    form = SearchForm()
+    message_form = MessageForm()
+
+    if request.method == "POST":
+        if "search_form" in request.POST:
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get("name")
+                subj = form.cleaned_data.get("subject")
+                interest_type = form.cleaned_data.get("interest_type")
+                admission_year = form.cleaned_data.get("admission_year")
+                
+                if admission_year:
+                    students = Student.objects.filter(admission_year=admission_year)
+
+                # Se completa nombre pero no intereses
+                if name and not interest_type and not subj:
+                    students = students.filter(
+                        Q(user__first_name__icontains=name)
+                        | Q(user__last_name__icontains=name)
+                    )
+
+                # Se completan solo intereses pero no nombres
+                elif not name and interest_type and subj:
+                    interests = Interest.objects.filter(
+                        interest_type_id=interest_type, subject_id=subj
+                    ).values("student_id")
+                    students = students.filter(id__in=Subquery(interests))
+
+                # Se completa solo el interes
+                elif not name and not subj and interest_type:
+                    interests = Interest.objects.filter(
+                        interest_type_id=interest_type,
+                    ).values("student_id")
+                    students = students.filter(id__in=Subquery(interests))
+
+                # Se completa nombre e intereses
+                elif name and interest_type and subj:
+                    interests = Interest.objects.filter(
+                        interest_type=interest_type, subject=subj
+                    ).values("student_id")
+
+                    students = students.filter(
+                        (
+                            Q(user__first_name__icontains=name)
+                            | Q(user__last_name__icontains=name)
+                        )
+                        & Q(id__in=Subquery(interests))
+                    )
+
+        elif "message_form" in request.POST:
+            receiver = User.objects.get(id=request.POST.get("id_receiver"))
+            message_form = MessageForm(request.POST)
+            if message_form.is_valid():
+                int_type = message_form.cleaned_data.get("interest_type")
+
+                if int_type.name == "AUXILIO":
+                    action = "necesito"
+                else:
+                    action = "ofrezco"
+
+                subj = message_form.cleaned_data.get("subject")
+                title = f"Contacto sobre {int_type} de {subj}"
+                message = (
+                    f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
+                )
+                message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
+                message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
+                sender_email = "sebastian.bustamante.2k3@gmail.com"
+                receiver_email = [receiver.email]
+
+                send_mail(title, message, sender_email, receiver_email)
+
+                # Guardar en la tabla de contacto la interaccion
+                new_contact = Contact(
+                    message=message,
+                    message_type_id=int_type,
+                    subject_id=subj,
+                    receiver_id=receiver,
+                    sender_id=request.user,
+                )
+                new_contact.save()
+
+    nrows = ceil(len(students) / 3)
+    context = {
+        "search_form": form,
+        "students": students,
+        "cant": len(students),
+        "nrows": [i for i in range(nrows)],
+        "message_form": message_form,
+    }
+
+    return render(request, "website/main_page.html", context)
 
 
 @role_required([User.ADMIN])
@@ -107,8 +207,22 @@ def admin_page(request, modelo=None):
         "plan_curricular": ["id", "impl_year", "name", "degree_id"],
         "tipo_interes": ["id", "name"],
         "carrera": ["id", "name"],
-        "historial": ["id", "year", "period", "interest_type_id", "subject_id", "student_id"],
-        "contacto": ["id", "message", "message_type_id", "receiver_id", "sender_id"],
+        "historial": [
+            "id",
+            "year",
+            "period",
+            "interest_type_id",
+            "subject_id",
+            "student_id",
+        ],
+        "contacto": [
+            "id",
+            "message",
+            "message_type_id",
+            "receiver_id",
+            "sender_id",
+            "subject_id",
+        ],
         "curso": ["id", "name", "period", "period_type", "plan_id"],
         "interes": ["id", "interest_type_id", "student_id", "subject_id"],
     }
@@ -137,9 +251,15 @@ def admin_page(request, modelo=None):
         "tipo_interes": ["name"],
         "carrera": ["name"],
         "historial": ["year", "period", "interest_type_id", "subject_id", "student_id"],
-        "contacto": ["message", "message_type_id", "receiver_id", "sender_id"],
+        "contacto": [
+            "message",
+            "message_type_id",
+            "receiver_id",
+            "sender_id",
+            "subject_id",
+        ],
         "curso": ["name", "period", "period_type", "plan_id"],
-        "interes": ["interest_type_id", "student_id", "subject_id"]
+        "interes": ["interest_type_id", "student_id", "subject_id"],
     }
 
     if modelo not in models:
@@ -204,6 +324,7 @@ def admin_page(request, modelo=None):
         "id": id,
         "raw_fields": all_field_names,
     }
+
     return render(request, "website/admin_page.html", context)
 
 
@@ -231,10 +352,12 @@ def do_login(request):
 
 
 @role_required([User.PROFESSOR, User.STUDENT])
-def profile_page(request):
-    user = request.user
+def profile_page(request, id_user=None):
+    user = User.objects.get(id=id_user)
+
     if user.role == user.STUDENT:
         degree = user.student.degree_id
+        message_form = MessageForm()
         adm_year = user.student.admission_year
         pfp = user.student.pfp
         cplan = user.student.curriculum_plan_id
@@ -254,10 +377,47 @@ def profile_page(request):
         form = StudentHistory(student_id=user.student)
 
         if request.method == "POST":
-            if "lista_aux" in request.POST or "lista_int" in request.POST or "lista_tutor" in request.POST or "lista_ayud" in request.POST:
+            if (
+                "lista_aux" in request.POST
+                or "lista_int" in request.POST
+                or "lista_tutor" in request.POST
+                or "lista_ayud" in request.POST
+            ):
                 model = Interest
             elif "lista_hist" in request.POST:
                 model = History
+
+            elif "message_form" in request.POST:
+                receiver = User.objects.get(id=request.POST.get("id_receiver"))
+                message_form = MessageForm(request.POST)
+                if message_form.is_valid():
+                    int_type = message_form.cleaned_data.get("interest_type")
+
+                    if int_type.name == "AUXILIO":
+                        action = "necesito"
+                    else:
+                        action = "ofrezco"
+
+                    subj = message_form.cleaned_data.get("subject")
+                    title = f"Contacto sobre {int_type} de {subj}"
+                    message = f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
+                    message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
+                    message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
+                    sender_email = "sebastian.bustamante.2k3@gmail.com"
+                    receiver_email = [receiver.email]
+
+                    send_mail(title, message, sender_email, receiver_email)
+
+                    # Guardar en la tabla de contacto la interaccion
+                    new_contact = Contact(
+                        message=message,
+                        message_type_id=int_type,
+                        subject_id=subj,
+                        receiver_id=receiver,
+                        sender_id=request.user,
+                    )
+                    new_contact.save()
+
             if "eliminar" in request.POST:
                 model.objects.get(id=request.POST.get("id")).delete()
             if "guardar" in request.POST:
@@ -266,10 +426,12 @@ def profile_page(request):
                 elif "lista_int" in request.POST:
                     form = StudentInterest(request.POST, student_id=user.student)
                 elif "pfp_estudiante" in request.POST:
-                    form = StudentProfilePicture(request.POST, request.FILES, instance=user.student)
+                    form = StudentProfilePicture(
+                        request.POST, request.FILES, instance=user.student
+                    )
                 if form.is_valid() and not "pfp_estudiante" in request.POST:
                     form.save()
-                    #form = model(student_id=user.student) # ????
+                    # form = model(student_id=user.student) # ????
                 else:
                     if form.is_valid():
                         if form.cleaned_data.get("pfp") is False:
@@ -278,7 +440,10 @@ def profile_page(request):
                             user.student.pfp = form.cleaned_data["pfp"]
 
                         user.student.save()
-                        return redirect("profile_page")
+                        id_user = user.id
+                        return redirect(
+                            reverse(f"profile_page", kwargs={"id_user": id_user})
+                        )
 
         context = {
             "user": user,
@@ -297,6 +462,7 @@ def profile_page(request):
             "interest_fields": ["subject_id"],
             "form_interest": StudentInterest(student_id=user.student),
             "pfp_form": StudentProfilePicture(instance=user.student),
+            "message_form": message_form,
         }
 
     elif user.role == user.PROFESSOR:
@@ -344,20 +510,22 @@ def delete_user(request):
             user.save()
     return redirect("logout")
 
+
 def professor_edit(request):
     user = request.user
     editable_fields = [
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "password1",
-            "password2",
-        ]
-
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "password1",
+        "password2",
+    ]
 
     if request.method == "POST":
-        user_form = UserRegisterForm(request.POST, instance=User.objects.get(id=user.id))
+        user_form = UserRegisterForm(
+            request.POST, instance=User.objects.get(id=user.id)
+        )
 
         email = request.POST.get("email")
 
@@ -394,31 +562,34 @@ def professor_edit(request):
         },
     )
 
+
 def student_edit(request):
 
     user = request.user
     student = user.student
 
     student_editable_fields = [
-            "admission_year",
-            "personal_mail",
-            "phone_number",
-            "degree_id",
-            "curriculum_plan_id",
-        ]
+        "admission_year",
+        "personal_mail",
+        "phone_number",
+        "degree_id",
+        "curriculum_plan_id",
+    ]
 
     user_editable_fields = [
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "password1",
-            "password2",
-        ]
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "password1",
+        "password2",
+    ]
 
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST, instance=user)
-        student_form = StudentRegisterForm(request.POST, request.FILES, instance=student, user=user)
+        student_form = StudentRegisterForm(
+            request.POST, request.FILES, instance=student, user=user
+        )
 
         email = request.POST.get("email")
 
@@ -442,7 +613,7 @@ def student_edit(request):
                 else:
                     user.set_password(user_form.cleaned_data["password1"])
             user.save()
-            
+
             for field in student_editable_fields:
                 setattr(student, field, student_form.cleaned_data[field])
             student.user = user
@@ -554,8 +725,10 @@ def professor_register(request):
         },
     )
 
-def generate_pdf(request):
-    user = request.user
+
+def generate_pdf(request, id_user=None):
+
+    user = User.objects.get(id=id_user)
     student = user.student
 
     # ¿Que se puede poner en el pdf?
@@ -589,29 +762,32 @@ def generate_pdf(request):
     )
 
     context = {
-            "user": user,
-            "role": "Estudiante",
-            "degree": degree,
-            "year": adm_year,
-            "pfp": pfp,
-            "cplan": cplan,
-            "history": student_history,
-            "fields": ["año", "periodo", "ramo", "tipo"],
-            "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
-            "form_history": StudentHistory(student_id=user.student),
-            "help_list": student_help,
-            "tutor_list": student_tutor,
-            "ayud_list": student_ayud, 
-            "interest_fields": ["subject_id"],
-            "form_interest": StudentInterest(student_id=user.student),
+        "user": user,
+        "role": "Estudiante",
+        "degree": degree,
+        "year": adm_year,
+        "pfp": pfp,
+        "cplan": cplan,
+        "history": student_history,
+        "fields": ["año", "periodo", "ramo", "tipo"],
+        "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
+        "form_history": StudentHistory(student_id=user.student),
+        "help_list": student_help,
+        "tutor_list": student_tutor,
+        "ayud_list": student_ayud,
+        "interest_fields": ["subject_id"],
+        "form_interest": StudentInterest(student_id=user.student),
     }
 
-    pdf = render_to_pdf('website/curriculum.html', context)
+    pdf = render_to_pdf("website/curriculum.html", context)
     if pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="curriculum.pdf"'
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="curriculum_{user.username}.pdf"'
+        )
         return response
     return HttpResponse("Error generating PDF")
+
 
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
@@ -619,8 +795,5 @@ def render_to_pdf(template_src, context_dict={}):
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
+        return HttpResponse(result.getvalue(), content_type="application/pdf")
     return None
-
-
-
