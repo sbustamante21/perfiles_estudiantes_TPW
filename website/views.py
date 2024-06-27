@@ -69,7 +69,7 @@ def main_page(request):
                 subj = form.cleaned_data.get("subject")
                 interest_type = form.cleaned_data.get("interest_type")
                 admission_year = form.cleaned_data.get("admission_year")
-                
+
                 if admission_year:
                     students = Student.objects.filter(admission_year=admission_year)
 
@@ -550,7 +550,7 @@ def professor_edit(request):
             if user == request.user:
                 update_session_auth_hash(request, user)
 
-            return redirect(reverse("profile_page"))
+            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))
     else:
         user_form = UserRegisterForm(instance=User.objects.get(id=user.id))
 
@@ -623,7 +623,9 @@ def student_edit(request):
             if user == request.user:
                 update_session_auth_hash(request, user)
 
-            return redirect(reverse("profile_page"))
+            return redirect(
+                reverse(f"profile_page", kwargs={"id_user": request.user.id})
+            )
 
     else:
         user_form = UserRegisterForm(instance=user)
