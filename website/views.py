@@ -550,7 +550,7 @@ def professor_edit(request):
             if user == request.user:
                 update_session_auth_hash(request, user)
 
-            return redirect(reverse("profile_page"))
+            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))
     else:
         user_form = UserRegisterForm(instance=User.objects.get(id=user.id))
 
