@@ -778,7 +778,9 @@ def generate_pdf(request, id_user=None):
     pdf = render_to_pdf("website/curriculum.html", context)
     if pdf:
         response = HttpResponse(pdf, content_type="application/pdf")
-        response["Content-Disposition"] = 'attachment; filename="curriculum.pdf"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="curriculum_{user.username}.pdf"'
+        )
         return response
     return HttpResponse("Error generating PDF")
 
