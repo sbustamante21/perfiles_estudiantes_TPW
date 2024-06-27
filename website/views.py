@@ -68,6 +68,10 @@ def main_page(request):
                 name = form.cleaned_data.get("name")
                 subj = form.cleaned_data.get("subject")
                 interest_type = form.cleaned_data.get("interest_type")
+                admission_year = form.cleaned_data.get("admission_year")
+                
+                if admission_year:
+                    students = Student.objects.filter(admission_year=admission_year)
 
                 # Se completa nombre pero no intereses
                 if name and not interest_type and not subj:

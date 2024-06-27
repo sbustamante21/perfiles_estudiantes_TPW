@@ -425,6 +425,7 @@ class SearchForm(forms.Form):
     name = forms.CharField(max_length=100, required=False, label='Nombre')
     interest_type = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=False)
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
+    admission_year = forms.IntegerField(required=False, label='Año Ingreso')
     # se pueden agregar mas filtros...
 
 class MessageForm(forms.Form):
