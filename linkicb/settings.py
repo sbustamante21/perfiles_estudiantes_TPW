@@ -80,7 +80,7 @@ WSGI_APPLICATION = "linkicb.wsgi.application"
 
 # Login & Logout URLs
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/home/"
+LOGIN_REDIRECT_URL = "/main_page/"
 LOGOUT_REDIRECT_URL = "/login/"
 
 TEMPLATES = [
@@ -127,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.AllowAllUsersModelBackend']
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.AllowAllUsersModelBackend"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -152,19 +152,19 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = 'website.User'
+AUTH_USER_MODEL = "website.User"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # For development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
 # For production (example using SMTP)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'sebastian.bustamante.2k3@gmail.com'
-EMAIL_HOST_PASSWORD = 'oxhb tfyc sogv axvi'
+EMAIL_HOST_USER = "sebastian.bustamante.2k3@gmail.com"
+EMAIL_HOST_PASSWORD = "oxhb tfyc sogv axvi"

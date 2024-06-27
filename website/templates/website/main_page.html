@@ -37,11 +37,15 @@
                      <div class="card-body">
                       <h4>{{student.user.username}}</h4>
                       {% if student.pfp %}
-                      <img src={{ student.pfp.url }} alt="hola"
-                      class="rounded-circle img-fluid" style="width: 150px;">
+                      <a href="{%url 'profile_page' student.user.id %}">
+                        <img src={{ student.pfp.url }} alt="hola"
+                        class="rounded-circle img-fluid" style="width: 150px;">
+                      </a>
                       {% else %}
-                          <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
-                      class="rounded-circle img-fluid" style="width: 150px;">
+                      <a href="{%url 'profile_page' student.user.id %}">
+                        <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
+                        class="rounded-circle img-fluid" style="width: 150px;">
+                      </a>
                       {% endif %}
                      </div>
                      <div class="card-footer">
