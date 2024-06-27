@@ -15,7 +15,7 @@
           <div class="card mb-4">
             <div class="card-body text-center">
                 {% if role == "Estudiante" and pfp %}
-                  <img src={{ pfp.url }} alt="hola"
+                  <img src = {{pfp.url}} alt="hola"
                   class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
                 {% else %}
                     <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
@@ -29,6 +29,10 @@
               {% endif %}
               <p class="text-muted mb-4">Universidad de Talca</p>
               <div class="d-flex justify-content-center mb-2">
+                {% if role == "Estudiante" %}
+                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Mensaje</button>
+                  <a  href="{% url 'generate_pdf' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-success ms-1">Generar currículum</a>
+                {% endif %}
                 {% if role == "Estudiante" and user != request.user %}
                 <button type="button" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">Mensaje</button>
                 {% endif %}
@@ -45,20 +49,21 @@
                 {% endif %}
               </div>
             </div>
-          </div>
+          </div>          
+
           {% if role == "Estudiante" %}
             <div class="card mb-4 mb-lg-0">
                 <div class="card-body p-0">
                   <div class="card-header text-center">
-                    Historial del Estudiante
+                    HISTORIAL DEL ESTUDIANTE
                   </div>
                     <table class="table text-center">
                       <thead>
                         <tr>
-                            {% for field in fields %}
-                                <th scope="col">{{ field }}</th>
-                            {% endfor %}
-                            <th>eliminar</th>
+                          {% for field in fields %}
+                            <th scope="col">{{ field }}</th>
+                          {% endfor %}
+                          <th>eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,6 +89,9 @@
                 </div>
             </div>
             <br>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#historialmodal">
+              Editar historial
+            </button>
             {%if user == request.user%}
             <div class="card mb-4 mb-lg-0">
               <div class="card-header text-center">
@@ -173,11 +181,14 @@
             </div>
           </div>
           {%if role == "Estudiante" %}
+          
           <div class="row">
-            <div class="col-md-4">
+            <div class="row-md-4">
                 <div class="card mb-4 mb-md-0">
+                  <div class="card-header">
+                  OFREZCO TUTORIA DE:
+                  </div>
                     <div class="card-body">
-                        <p class="mb-4"> OFREZCO TUTORIA DE </p>
                         <ul>
                           {% for tutor in tutor_list %}
                             {% for field in interest_fields %}
@@ -188,7 +199,6 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="lista_tutor">
                                 <input type="hidden" name="id" value="{{ tutor.id }}">
-                                <br>
                                 <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                               </form>
                               {%endif%}
@@ -199,10 +209,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card mb-4 mb-md-0">
+            <br>
+            <div class="row-md-4">
+              <div class="card mb-4 mb-md-0">
+                <div class="card-header">
+                OFREZCO AYUDANTIA DE:
+                </div>
                   <div class="card-body">
-                      <p class="mb-4">OFREZCO AYUDANTIA DE</p>
                       <ul>
                         {% for ayud in ayud_list %}
                           {% for field in interest_fields %}
@@ -213,7 +226,6 @@
                               {% csrf_token %}
                               <input type="hidden" name="lista_ayud">
                               <input type="hidden" name="id" value="{{ ayud.id }}">
-                              <br>
                               <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                             </form>
                             {%endif%}
@@ -223,11 +235,14 @@
                       </ul>
                   </div>
               </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card mb-4 mb-md-0">
-              <div class="card-body">
-                  <p class="mb-4">NECESITO AUXILIO EN</p>
+            </div>
+            <br>
+            <div class="row-md-4">
+              <div class="card mb-4 mb-md-0">
+                <div class="card-header">
+                NECESITO AYUDA EN:
+                </div>
+                <div class="card-body">
                   <ul>
                     {% for help in help_list %}
                       {% for field in interest_fields %}
@@ -238,7 +253,6 @@
                           {% csrf_token %}
                           <input type="hidden" name="lista_aux">
                           <input type="hidden" name="id" value="{{ help.id }}">
-                          <br>
                           <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
                         </form>
                         {%endif%}
@@ -246,6 +260,15 @@
                       {% endfor %}
                     {% endfor %}
                   </ul>
+                </div>
+              </div>            
+            </div>
+          </div>
+        <br>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#añadirramosmodal">
+          Añadir o eliminar ramos
+        </button>
+
               </div>
           </div>            
         </div>
@@ -274,8 +297,60 @@
 </div>
 </section>
 
-{% comment %} Modal para la foto de perfil del usuario {% endcomment %}
 {%if role == "Estudiante" and user == request.user %}
+
+<div class="modal fade" id="historialmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          EDITAR HISTORIAL
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="lista_hist">
+        {% bootstrap_form form_history %}
+        {% buttons %}
+        <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+        {% endbuttons %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="añadirramosmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          AÑADIR RAMOS PARA OFRECER O PEDIR AYUDA
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="lista_int">
+          {% bootstrap_form form_interest %}
+          {% buttons %}
+            <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+          {% endbuttons %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+      </div>
 <div class="modal fade" 
          id="pfpmodal" 
          tabindex="-1" 
@@ -286,7 +361,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" 
                         id="exampleModalLabel">
-                        Foto de Perfil
+                        EDITAR FOTO DE PERFIL
                     </h5>
                     <button type="button" 
                             class="btn-close" 
@@ -315,6 +390,8 @@
             </div>
         </div>
     </div>
+  </div>
+</div>
 {% endif %}
 
 {%if role == "Estudiante"%}
