@@ -73,7 +73,7 @@
                                 <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{%url 'profile_page'%}">Mi perfil</a>
+                                <a class="nav-link active" aria-current="page" href="{%url 'profile_page' request.user.id%}">Mi perfil</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
