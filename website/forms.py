@@ -85,16 +85,18 @@ class UserRegisterForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         # Accept 'instance' keyword argument
-        self.instance = kwargs.get('instance', None)
+        self.instance = kwargs.get("instance", None)
         super().__init__(*args, **kwargs)
-    
+
     def clean_username(self):
-        username = self.cleaned_data.get('username')
+        username = self.cleaned_data.get("username")
         existing_users = User.objects.filter(username=username)
         if self.instance:
             existing_users = existing_users.exclude(pk=self.instance.pk)
         if existing_users.exists():
-            raise forms.ValidationError("This username is already used by another user.")
+            raise forms.ValidationError(
+                "This username is already used by another user."
+            )
         return username
 
     def clean_email(self):
@@ -174,8 +176,8 @@ class StudentRegisterForm(forms.ModelForm):
         exclude = ["pfp"]
 
     def __init__(self, *args, **kwargs):
-        self.instance = kwargs.get('instance', None)
-        self.user = kwargs.pop('user', None)
+        self.instance = kwargs.get("instance", None)
+        self.user = kwargs.pop("user", None)
         super(StudentRegisterForm, self).__init__(*args, **kwargs)
 
     def clean_admission_year(self):
@@ -189,7 +191,11 @@ class StudentRegisterForm(forms.ModelForm):
         email = self.cleaned_data.get("personal_mail")
 
         if email != "":
-            if Student.objects.filter(personal_mail=email).exclude(user=self.user).exists():
+            if (
+                Student.objects.filter(personal_mail=email)
+                .exclude(user=self.user)
+                .exists()
+            ):
                 raise forms.ValidationError("This email is already used")
         return email
 
@@ -197,11 +203,16 @@ class StudentRegisterForm(forms.ModelForm):
         number = self.cleaned_data.get("phone_number")
 
         if number is not None:
-            if Student.objects.filter(phone_number=number).exclude(user=self.user).exists():
+            if (
+                Student.objects.filter(phone_number=number)
+                .exclude(user=self.user)
+                .exists()
+            ):
                 raise forms.ValidationError("This phone number is already used")
             elif len(str(number)) != 9:
                 raise forms.ValidationError("The phone number must be 9 digits long")
         return number
+
 
 class StudentProfilePicture(forms.ModelForm):
     pfp = forms.ImageField(required=False)
@@ -209,11 +220,10 @@ class StudentProfilePicture(forms.ModelForm):
     class Meta:
         model = Student
         fields = ["pfp"]
-    
-    def __init__(self, *args, **kwargs):
-        self.instance = kwargs.get('instance', None)
-        super(StudentProfilePicture, self).__init__(*args, **kwargs)
 
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get("instance", None)
+        super(StudentProfilePicture, self).__init__(*args, **kwargs)
 
 
 class PeriodTypeFormAdmin(forms.ModelForm):
@@ -258,7 +268,8 @@ class DegreeFormAdmin(forms.ModelForm):
         fields = [
             "name",
         ]
-        
+
+
 class SubjectFormAdmin(forms.ModelForm):
     NUMBER_CHOICES = [
         (1, "1"),
@@ -266,9 +277,13 @@ class SubjectFormAdmin(forms.ModelForm):
     ]
     name = forms.CharField(required=True)
     period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
-    period_type = forms.ModelChoiceField(queryset=PeriodType.objects.all(),required=True)
-    plan_id = forms.ModelChoiceField(queryset=CurriculumPlan.objects.all(), required=True)
-    
+    period_type = forms.ModelChoiceField(
+        queryset=PeriodType.objects.all(), required=True
+    )
+    plan_id = forms.ModelChoiceField(
+        queryset=CurriculumPlan.objects.all(), required=True
+    )
+
     class Meta:
         model = Subject
         fields = [
@@ -278,6 +293,7 @@ class SubjectFormAdmin(forms.ModelForm):
             "plan_id",
         ]
 
+
 class HistoryFormAdmin(forms.ModelForm):
     NUMBER_CHOICES = [
         (1, "1"),
@@ -285,10 +301,12 @@ class HistoryFormAdmin(forms.ModelForm):
     ]
     year = forms.IntegerField(required=True)
     period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
-    interest_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    interest_type_id = forms.ModelChoiceField(
+        queryset=InterestType.objects.all(), required=True
+    )
     subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
     student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=True)
-    
+
     class Meta:
         model = History
         fields = [
@@ -298,17 +316,22 @@ class HistoryFormAdmin(forms.ModelForm):
             "subject_id",
             "student_id",
         ]
-    
+
+
 class ContactFormAdmin(forms.ModelForm):
-    
+
     HELP_CHOICES = [
-        ('option1', 'Una ayuda, por favor!'),
-        ('option2', 'Necesito ayuda con esto'),
-        ('option3', 'Me ayudas?'),
+        ("option1", "Una ayuda, por favor!"),
+        ("option2", "Necesito ayuda con esto"),
+        ("option3", "Me ayudas?"),
     ]
 
-    message = forms.ChoiceField(choices=HELP_CHOICES, widget=forms.RadioSelect, required=True)
-    message_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    message = forms.ChoiceField(
+        choices=HELP_CHOICES, widget=forms.RadioSelect, required=True
+    )
+    message_type_id = forms.ModelChoiceField(
+        queryset=InterestType.objects.all(), required=True
+    )
     receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
     sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
     subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
@@ -323,19 +346,23 @@ class ContactFormAdmin(forms.ModelForm):
             "subject_id",
         ]
 
+
 class InterestFormAdmin(forms.ModelForm):
-    interest_type_id = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
+    interest_type_id = forms.ModelChoiceField(
+        queryset=InterestType.objects.all(), required=True
+    )
     student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=True)
     subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
-    
+
     class Meta:
         model = Interest
         fields = [
             "interest_type_id",
             "student_id",
-            "subject_id", 
+            "subject_id",
         ]
-        
+
+
 class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)
@@ -421,18 +448,23 @@ class StudentInterest(forms.ModelForm):
         if student_id:
             self.fields["student_id"].initial = student_id
 
+
 class SearchForm(forms.Form):
-    name = forms.CharField(max_length=100, required=False, label='Nombre')
-    interest_type = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=False)
+    name = forms.CharField(max_length=100, required=False, label="Nombre")
+    interest_type = forms.ModelChoiceField(
+        queryset=InterestType.objects.all(), required=False
+    )
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
     # se pueden agregar mas filtros...
 
+
 class MessageForm(forms.Form):
     HELP_CHOICES = [
-        ('option1', 'Una ayuda, por favor!'),
-        ('option2', 'Necesito ayuda con esto'),
-        ('option3', 'Me ayudas?'),
+        ("option1", "Una ayuda, por favor!"),
+        ("option2", "Necesito ayuda con esto"),
+        ("option3", "Me ayudas?"),
     ]
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
-    interest_type = forms.ModelChoiceField(queryset=InterestType.objects.all(), required=True)
-
+    interest_type = forms.ModelChoiceField(
+        queryset=InterestType.objects.all(), required=True
+    )
