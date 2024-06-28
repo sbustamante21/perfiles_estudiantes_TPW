@@ -799,3 +799,6 @@ def render_to_pdf(template_src, context_dict={}):
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type="application/pdf")
     return None
+
+def custom_404(request, exception):
+    return render(request, 'custom_404.html', status=404)
