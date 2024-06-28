@@ -1,0 +1,15 @@
+{% load bootstrap5 %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+</head>
+<body>
+    <h1>Error al cargar la Página</h1>
+    <p>Lo sentimos, vuelve al inicio.</p>
+    <a href="{% url 'welcome' %}">Volver al inicio</a>
+</body>
+</html>
+{% bootstrap_css %}
+{% bootstrap_javascript %}
