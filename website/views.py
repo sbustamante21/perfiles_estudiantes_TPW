@@ -10,8 +10,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
 from django.db.models import Q, Subquery, OuterRef
-from django.core.mail import send_mail
-from .utils import render_to_pdf
+from .utils import render_to_pdf, send_custom_email
 from .forms import (
     StudentRegisterForm,
     UserRegisterForm,
@@ -112,34 +111,13 @@ def main_page(request):
             receiver = User.objects.get(id=request.POST.get("id_receiver"))
             message_form = MessageForm(request.POST)
             if message_form.is_valid():
-                int_type = message_form.cleaned_data.get("interest_type")
-
-                if int_type.name == "AUXILIO":
-                    action = "necesito"
-                else:
-                    action = "ofrezco"
-
-                subj = message_form.cleaned_data.get("subject")
-                title = f"Contacto sobre {int_type} de {subj}"
-                message = (
-                    f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
+                # sender_email, receiver, int_type, subj
+                send_custom_email(
+                    request.user,
+                    receiver,
+                    message_form.cleaned_data.get("interest_type"),
+                    message_form.cleaned_data.get("subject"),
                 )
-                message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
-                message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
-                sender_email = "linkicb1@gmail.com"
-                receiver_email = [receiver.email]
-
-                send_mail(title, message, sender_email, receiver_email)
-
-                # Guardar en la tabla de contacto la interaccion
-                new_contact = Contact(
-                    message=message,
-                    message_type_id=int_type,
-                    subject_id=subj,
-                    receiver_id=receiver,
-                    sender_id=request.user,
-                )
-                new_contact.save()
 
     nrows = ceil(len(students) / 3)
     context = {
@@ -391,32 +369,12 @@ def profile_page(request, id_user=None):
                 receiver = User.objects.get(id=request.POST.get("id_receiver"))
                 message_form = MessageForm(request.POST)
                 if message_form.is_valid():
-                    int_type = message_form.cleaned_data.get("interest_type")
-
-                    if int_type.name == "AUXILIO":
-                        action = "necesito"
-                    else:
-                        action = "ofrezco"
-
-                    subj = message_form.cleaned_data.get("subject")
-                    title = f"Contacto sobre {int_type} de {subj}"
-                    message = f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
-                    message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
-                    message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
-                    sender_email = "sebastian.bustamante.2k3@gmail.com"
-                    receiver_email = [receiver.email]
-
-                    send_mail(title, message, sender_email, receiver_email)
-
-                    # Guardar en la tabla de contacto la interaccion
-                    new_contact = Contact(
-                        message=message,
-                        message_type_id=int_type,
-                        subject_id=subj,
-                        receiver_id=receiver,
-                        sender_id=request.user,
+                    send_custom_email(
+                        request.user,
+                        receiver,
+                        message_form.cleaned_data.get("interest_type"),
+                        message_form.cleaned_data.get("subject"),
                     )
-                    new_contact.save()
 
             if "eliminar" in request.POST:
                 model.objects.get(id=request.POST.get("id")).delete()
@@ -790,5 +748,6 @@ def generate_pdf(request, id_user=None):
         return response
     return HttpResponse("Error generating PDF")
 
+
 def custom_404(request, exception):
-    return render(request, 'custom_404.html', status=404)
+    return render(request, "custom_404.html", status=404)
