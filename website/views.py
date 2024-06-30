@@ -126,7 +126,7 @@ def main_page(request):
                 )
                 message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
                 message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
-                sender_email = "sebastian.bustamante.2k3@gmail.com"
+                sender_email = "linkicb1@gmail.com"
                 receiver_email = [receiver.email]
 
                 send_mail(title, message, sender_email, receiver_email)

@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-t$sdmjub+#l8bxorr@wfphob8^3b%tnl7@t-7w8*g5*g3^lzo4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -50,7 +50,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",   
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # "django.middleware.locale.LocaleMiddleware",
 ]
 
@@ -166,5 +166,5 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "sebastian.bustamante.2k3@gmail.com"
-EMAIL_HOST_PASSWORD = "oxhb tfyc sogv axvi"
+EMAIL_HOST_USER = "linkicb1@gmail.com"
+EMAIL_HOST_PASSWORD = "jsih ljob czzb iryg"
