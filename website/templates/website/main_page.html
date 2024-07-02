@@ -50,7 +50,6 @@
                      </div>
                      <div class="card-footer">
                       {%if student.user != request.user%}
-                        <input type="hidden" name="id_receiver" id="receiver_input_hidden" value="{{student.user.id}}">
                         <button type="button" onclick="setReceiverId('{{ student.user.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">Mensaje</button>
                       {%endif%}
                      </div>

@@ -244,6 +244,7 @@ def admin_page(request, modelo=None):
 
     model = models[modelo]
     form_model = forms[modelo]
+    password_form = UserPasswordUpdateFormAdmin()
     objs = model.objects.all()
     all_field_names = fields[modelo]
     form = form_model()
@@ -266,17 +267,15 @@ def admin_page(request, modelo=None):
             editing = True
             id = obj.id
 
-        elif "guardar" in request.POST:
+        elif "guardar" in request.POST and not "password_form" in request.POST:
             # form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
                 form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
-                        if field != "password" and field != "pfp":
+                        if field != "pfp":
                             setattr(obj, field, form.cleaned_data[field])
-                        elif field == "password":
-                            obj.set_password(form.cleaned_data[field])
                         elif field == "pfp":
                             if form.cleaned_data.get("pfp") is False:
                                 setattr(obj, field, None)
@@ -289,7 +288,15 @@ def admin_page(request, modelo=None):
                 form = form_model(request.POST, request.FILES)
                 if form.is_valid():
                     form.save()
-                    form = form_model()
+
+        elif "password_form" in request.POST:
+            password_form = UserPasswordUpdateFormAdmin(request.POST)
+            obj = model.objects.get(id=request.POST.get("id_receiver"))
+            if password_form.is_valid():
+                obj.set_password(password_form.cleaned_data["password"])
+                obj.save()
+            password_form = UserPasswordUpdateFormAdmin()
+                
 
     context = {
         "model": model,
@@ -300,6 +307,7 @@ def admin_page(request, modelo=None):
         "editing": editing,
         "id": id,
         "raw_fields": all_field_names,
+        "password_form": UserPasswordUpdateFormAdmin(),
     }
 
     return render(request, "website/admin_page.html", context)
