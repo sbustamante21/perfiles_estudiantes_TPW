@@ -72,6 +72,26 @@
                             </li>
                           
                         {% elif request.user.role != user.ADMIN %}
+
+                            <li>
+                                <div class="dropdown">
+                                    <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {%if request.user.pfp%}
+                                            <img src="{{request.user.pfp.url}}" alt="pfp" width="32" height="32" class="rounded-circle me-2">
+                                        {%else%}
+                                            <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="pfp" width="32" height="32" class="rounded-circle me-2">
+                                        {%endif%}
+                                        <strong>{{request.user.username}}</strong>
+                                    </a>
+                                    <ul class="dropdown-menu text-small shadow" style="">
+                                      <li><a class="dropdown-item" href="#">New project...</a></li>
+                                      <li><a class="dropdown-item" href="#">Settings</a></li>
+                                      <li><a class="dropdown-item" href="#">Profile</a></li>
+                                      <li><hr class="dropdown-divider"></li>
+                                      <li><a class="dropdown-item" href="#">Sign out</a></li>
+                                    </ul>
+                                  </div>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{%url 'logout'%}">Cerrar sesión</a>
                             </li>
