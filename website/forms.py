@@ -39,7 +39,7 @@ class StudentHistory(forms.ModelForm):
         queryset=Student.objects.all(),
         required=False,
         disabled=True,
-        widget=forms.Select(attrs={"class": "hidden"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -112,6 +112,17 @@ class UserRegisterForm(UserCreationForm):
         return email
 
 
+class UserPasswordUpdateFormAdmin(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ["password"]
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get("instance", None)
+        super(UserPasswordUpdateFormAdmin, self).__init__(*args, **kwargs)
+
+
 class UserRegisterFormAdmin(forms.ModelForm):
     username = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(required=True)
@@ -119,7 +130,6 @@ class UserRegisterFormAdmin(forms.ModelForm):
     last_name = forms.CharField(max_length=30, required=True)
     is_active = forms.BooleanField(required=False, initial=True, label="Activo")
     role = forms.ChoiceField(choices=User.ROLE_CHOICES, label="Rol")
-    password = forms.CharField(max_length=100, required=True)
 
     class Meta:
         model = User
@@ -132,6 +142,7 @@ class UserRegisterFormAdmin(forms.ModelForm):
             "is_active",
             "role",
         ]
+        exclude = ["password"]
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get("instance", None)
@@ -431,7 +442,7 @@ class StudentInterest(forms.ModelForm):
         queryset=Student.objects.all(),
         required=False,
         disabled=True,
-        widget=forms.Select(attrs={"class": "hidden"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -455,7 +466,7 @@ class SearchForm(forms.Form):
         queryset=InterestType.objects.all(), required=False
     )
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
-    admission_year = forms.IntegerField(required=False, label='Año Ingreso')
+    admission_year = forms.IntegerField(required=False, label="Año Ingreso")
     # se pueden agregar mas filtros...
 
 

@@ -1,5 +1,4 @@
 {% load bootstrap5 %}
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -8,7 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% if title %} {{title}} {% else %} Link-ICB {% endif %}</title>
     {% bootstrap_css %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'website/style.css' %}">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script src="{% static 'website/main.js' %}"></script>
 </head>
 
 <body>

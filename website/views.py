@@ -30,6 +30,7 @@ from .forms import (
     InterestFormAdmin,
     SearchForm,
     MessageForm,
+    UserPasswordUpdateFormAdmin,
 )
 from .models import (
     Student,
@@ -173,7 +174,6 @@ def admin_page(request, modelo=None):
         ],
         "usuario": [
             "id",
-            "password",
             "username",
             "first_name",
             "last_name",
@@ -216,7 +216,6 @@ def admin_page(request, modelo=None):
             "curriculum_plan_id",
         ],
         "usuario": [
-            "password",
             "username",
             "first_name",
             "last_name",
