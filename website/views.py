@@ -59,7 +59,7 @@ def main_page(request):
     students = Student.objects.all()
     interests = Interest.objects.all()
     form = SearchForm()
-    message_form = MessageForm()
+    message_form = MessageForm(user=request.user)
 
     if request.method == "POST":
         if "search_form" in request.POST:
@@ -110,7 +110,7 @@ def main_page(request):
 
         elif "message_form" in request.POST:
             receiver = User.objects.get(id=request.POST.get("id_receiver"))
-            message_form = MessageForm(request.POST)
+            message_form = MessageForm(request.POST, user=request.user)
             if message_form.is_valid():
                 # sender_email, receiver, int_type, subj
                 send_custom_email(
@@ -342,7 +342,7 @@ def profile_page(request, id_user=None):
 
     if user.role == user.STUDENT:
         degree = user.student.degree_id
-        message_form = MessageForm()
+        message_form = MessageForm(user=request.user)
         adm_year = user.student.admission_year
         pfp = user.student.pfp
         cplan = user.student.curriculum_plan_id
@@ -374,7 +374,7 @@ def profile_page(request, id_user=None):
 
             elif "message_form" in request.POST:
                 receiver = User.objects.get(id=request.POST.get("id_receiver"))
-                message_form = MessageForm(request.POST)
+                message_form = MessageForm(request.POST, user=request.user)
                 if message_form.is_valid():
                     send_custom_email(
                         request.user,

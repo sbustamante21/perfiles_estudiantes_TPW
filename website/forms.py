@@ -471,12 +471,16 @@ class SearchForm(forms.Form):
 
 
 class MessageForm(forms.Form):
-    HELP_CHOICES = [
-        ("option1", "Una ayuda, por favor!"),
-        ("option2", "Necesito ayuda con esto"),
-        ("option3", "Me ayudas?"),
-    ]
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
     interest_type = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user")
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        if user.role == User.PROFESSOR:
+            self.fields["interest_type"].queryset = InterestType.objects.filter(name="AYUDANTIA")
+        elif user.role == User.STUDENT:
+            self.fields["interest_type"].queryset = InterestType.objects.exclude(name="AYUDANTIA")
