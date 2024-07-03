@@ -203,7 +203,7 @@ class StudentRegisterForm(forms.ModelForm):
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
 
-        if not datetime.datetime.now().year >= admission_year >= 1980:
+        if not datetime.datetime.now().year >= int(admission_year) >= 1980:
             raise forms.ValidationError("Year out of bounds")
         return admission_year
 
@@ -477,10 +477,9 @@ class SearchForm(forms.Form):
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
     admission_year = forms.ChoiceField(
         choices=generate_year_choices(),
-        required=True,
+        required=False,
         label='Año de Ingreso'
     )
-    # se pueden agregar mas filtros...
 
 
 class MessageForm(forms.Form):
