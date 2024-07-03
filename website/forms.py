@@ -39,7 +39,7 @@ class StudentHistory(forms.ModelForm):
         queryset=Student.objects.all(),
         required=False,
         disabled=True,
-        widget=forms.Select(attrs={"class": "hidden"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -114,6 +114,17 @@ class UserRegisterForm(UserCreationForm):
         return email
 
 
+class UserPasswordUpdateFormAdmin(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ["password"]
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get("instance", None)
+        super(UserPasswordUpdateFormAdmin, self).__init__(*args, **kwargs)
+
+
 class UserRegisterFormAdmin(forms.ModelForm):
     username = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(required=True)
@@ -121,7 +132,6 @@ class UserRegisterFormAdmin(forms.ModelForm):
     last_name = forms.CharField(max_length=30, required=True)
     is_active = forms.BooleanField(required=False, initial=True, label="Activo")
     role = forms.ChoiceField(choices=User.ROLE_CHOICES, label="Rol")
-    password = forms.CharField(max_length=100, required=True)
 
     class Meta:
         model = User
@@ -134,6 +144,7 @@ class UserRegisterFormAdmin(forms.ModelForm):
             "is_active",
             "role",
         ]
+        exclude = ["password"]
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get("instance", None)
@@ -433,7 +444,7 @@ class StudentInterest(forms.ModelForm):
         queryset=Student.objects.all(),
         required=False,
         disabled=True,
-        widget=forms.Select(attrs={"class": "hidden"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -457,18 +468,21 @@ class SearchForm(forms.Form):
         queryset=InterestType.objects.all(), required=False
     )
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
-    admission_year = forms.IntegerField(required=False, label='Año Ingreso')
+    admission_year = forms.IntegerField(required=False, label="Año Ingreso")
     # se pueden agregar mas filtros...
 
 
 class MessageForm(forms.Form):
-    HELP_CHOICES = [
-        ("option1", "Una ayuda, por favor!"),
-        ("option2", "Necesito ayuda con esto"),
-        ("option3", "Me ayudas?"),
-    ]
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
     interest_type = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user")
+        super(MessageForm, self).__init__(*args, **kwargs)
 
+        if user.role == User.PROFESSOR:
+            self.fields["interest_type"].queryset = InterestType.objects.filter(name="AYUDANTIA")
+        elif user.role == User.STUDENT:
+            self.fields["interest_type"].queryset = InterestType.objects.exclude(name="AYUDANTIA")
