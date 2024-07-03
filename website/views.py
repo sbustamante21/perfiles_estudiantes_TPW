@@ -11,6 +11,7 @@ from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
 from django.db.models import Q, Subquery, OuterRef
 from .utils import render_to_pdf, send_custom_email
+from django.core.paginator import Paginator
 from .forms import (
     StudentRegisterForm,
     UserRegisterForm,
@@ -263,7 +264,7 @@ def admin_page(request, modelo=None):
             id = obj.id
 
         elif "guardar" in request.POST and not "password_form" in request.POST:
-            # form = form_model(request.POST) # Se redeclara el form?
+            #form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
                 form = form_model(request.POST, request.FILES, instance=obj)
@@ -303,6 +304,7 @@ def admin_page(request, modelo=None):
         "id": id,
         "raw_fields": all_field_names,
         "password_form": UserPasswordUpdateFormAdmin(),
+        "model_queue": modelo,
     }
 
     return render(request, "website/admin_page.html", context)

@@ -3,8 +3,17 @@
 {% block content %}
 {% load website_filters %}
 
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" />
+
 <div class="container mt-5 pt-5">
-    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name }}</h2>
+    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name }}
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#save_edit_modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+        </button>
+    </h2>
     <div class="table-responsive">
         <table class="table" id="data_table">
             <thead>
@@ -22,10 +31,14 @@
                             <td>{{ obj|attr:field|display_role:field }}</td>
                         {% endfor %}
                         <td>
-                            <form method="post" style="display:inline;">
+                            <form method="post" style="display:inline;" id="edit_form">
                                 {% csrf_token %}
                                 <input type="hidden" name="id" value="{{ obj.id }}">
-                                <button class = "btn btn-warning" type="submit" name="editar">Edit</button>
+                                <button class = "btn btn-warning" type="submit" name="editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                                    </svg>
+                                </button>
                             </form>
                             {% if model_name == "usuarios" %}
                                 <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#password_modal" class="btn btn-primary ms-1">Cambiar contraseña</button>
@@ -34,7 +47,11 @@
                                 <form method="post" style="display:inline;">
                                     {% csrf_token %}
                                     <input type="hidden" name="id" value="{{ obj.id }}">
-                                    <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Delete</button>
+                                    <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                            </svg>
+                                    </button>
                                 </form>
                             {% endif %}
                         </td>
@@ -45,24 +62,51 @@
     </div>
 </div>
 
-<div class="col">
-    <div class="card card-body">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            {% buttons %}
-                {% if editing == True %}
-                    <button class="btn btn-primary" type="submit" name="guardar">Actualizar</button>
-                {% else %}
-                    <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
-                {% endif %}
-            {% endbuttons %}
-            <input type="hidden" name="editing" value="{{ editing }}">
-            <input type="hidden" name="id" value="{{ id }}">
-        </form>
-    </div>
-</div>
+<div class="modal fade" 
+         id="save_edit_modal" 
+         tabindex="-1" 
+         aria-labelledby="exampleModalLabel" 
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" 
+                        id="exampleModalLabel">
+                        {{model_name}}
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            data-bs-dismiss="modal" 
+                            aria-label="Close">
 
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        {% buttons %}
+                            {% if editing == True %}
+                                <button class="btn btn-primary" type="submit" name="guardar">Actualizar</button>
+                            {% else %}
+                                <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                            {% endif %}
+                        {% endbuttons %}
+                        <input type="hidden" name="editing" value="{{ editing }}">
+                        <input type="hidden" name="id" value="{{ id }}">
+                        <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+</div>
 
 <div class="modal fade" 
          id="password_modal" 
@@ -74,7 +118,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" 
                         id="exampleModalLabel">
-                        Contacto
+                        Cambiar Contraseña
                     </h5>
                     <button type="button" 
                             class="btn-close" 
@@ -105,14 +149,12 @@
         </div>
 </div>
 
-
-<!-- jQuery -->
 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
-<!-- DataTables JS -->
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
 
+
 <script>
+
     $(document).ready( function () {
         $('#data_table').DataTable();
     } );
