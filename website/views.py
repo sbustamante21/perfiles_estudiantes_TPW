@@ -192,7 +192,6 @@ def admin_page(request, modelo=None):
         ],
         "contacto": [
             "id",
-            "message",
             "message_type_id",
             "receiver_id",
             "sender_id",
@@ -226,7 +225,6 @@ def admin_page(request, modelo=None):
         "carrera": ["name"],
         "historial": ["year", "period", "interest_type_id", "subject_id", "student_id"],
         "contacto": [
-            "message",
             "message_type_id",
             "receiver_id",
             "sender_id",

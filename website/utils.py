@@ -83,12 +83,11 @@ def send_custom_email(sender, receiver, int_type, subj):
 
     email = EmailMessage(title, html_message, "linkicb1@gmail.com", [receiver.email])
 
-    email.content_subtype = "html"  # This is required to send HTML email
+    email.content_subtype = "html"
     email.send()
 
     # Guardar en la tabla de contacto la interaccion
     new_contact = Contact(
-        message="",
         message_type_id=int_type,
         subject_id=subj,
         receiver_id=receiver,

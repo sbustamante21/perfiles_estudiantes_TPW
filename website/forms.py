@@ -338,15 +338,6 @@ class HistoryFormAdmin(forms.ModelForm):
 
 class ContactFormAdmin(forms.ModelForm):
 
-    HELP_CHOICES = [
-        ("option1", "Una ayuda, por favor!"),
-        ("option2", "Necesito ayuda con esto"),
-        ("option3", "Me ayudas?"),
-    ]
-
-    message = forms.ChoiceField(
-        choices=HELP_CHOICES, widget=forms.RadioSelect, required=True
-    )
     message_type_id = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
@@ -357,7 +348,6 @@ class ContactFormAdmin(forms.ModelForm):
     class Meta:
         model = Contact
         fields = [
-            "message",
             "message_type_id",
             "receiver_id",
             "sender_id",
