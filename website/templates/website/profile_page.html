@@ -33,7 +33,7 @@
                 <button type="button" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">Mensaje</button>
                 {% endif %}
                 {%if role == "Estudiante"%}
-                <a  href="{% url 'generate_pdf' user.id %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar curriculum</a>
+                <a  href="{% url 'generate_pdf' user.id %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar currículum</a>
                 {%endif%}
                 {% if user == request.user%}
                 <a  href="{% url 'change_password' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Actualizar Contraseña</a>

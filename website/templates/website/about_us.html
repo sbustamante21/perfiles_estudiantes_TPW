@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+
+<div class="container pt-5 text-center">
+    <div class="p-5 text-center bg-body-tertiary">
+        <div class="container py-5">
+          <h1 class="text-body-emphasis">Quiénes Somos</h1>
+          <p class="col-lg-8 mx-auto lead">
+            Estudiantes de Ingeniería Civil en Bioinformática de la Universidad de Talca
+          </p>
+        </div>
+      </div>
+    <div class="container my-5">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="team-member">
+                    <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="Sebastian Bustamante" class="img-fluid rounded-circle mb-3">
+                    <h2>Sebastián Bustamante</h2>
+                    <p>sbustamante21@alumnos.utalca.cl</p>
+                    <p>Estudiante de Ingeniería Civil en Bioinformática</p>
+                    <p>Universidad de Talca</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-member">
+                    <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="Cecilia Castillo" class="img-fluid rounded-circle mb-3">
+                    <h2>Cecilia Castillo</h2>
+                    <p>cecastillo19@alumnos.utalca.cl</p>
+                    <p>Estudiante de Ingeniería Civil en Bioinformática</p>
+                    <p>Universidad de Talca</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-member">
+                    <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="Magdalena Lolas" class="img-fluid rounded-circle mb-3">
+                    <h2>Magdalena Lolas</h2>
+                    <p>mlolas19@alumnos.utalca.cl</p>
+                    <p>Estudiante de Ingeniería Civil en Bioinformática</p>
+                    <p>Universidad de Talca</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% endblock content %}
+

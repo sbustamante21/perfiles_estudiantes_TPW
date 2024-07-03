@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load bootstrap5 %} {% block content %}
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+{% block content %}
 
   <div class="container mt-5 pt-5">
     <form method="POST" action="{% url 'login' %}">
@@ -15,5 +17,4 @@
 
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-
 {% endblock content %}

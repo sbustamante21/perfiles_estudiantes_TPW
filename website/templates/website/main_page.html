@@ -38,7 +38,7 @@
                       <h4>{{student.user.username}}</h4>
                       {% if student.pfp %}
                       <a href="{%url 'profile_page' student.user.id %}">
-                        <img src={{ student.pfp.url }} alt="hola"
+                        <img src={{student.pfp.url}} alt="hola"
                         class="rounded-circle img-fluid" style="width: 150px;">
                       </a>
                       {% else %}
