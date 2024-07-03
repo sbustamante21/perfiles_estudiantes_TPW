@@ -1,10 +1,12 @@
 {% load bootstrap5 %}
+{% load website_filters %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
 </head>
-<body>
+  <body>
     <div class="container">
       <div class="card p-6 p-lg-10 space-y-4">
         <h1 class="h3 fw-700">
@@ -12,7 +14,7 @@
         </h1>
         <p>
           Hola, {{receiver.first_name}} {{receiver.last_name}}. <br>
-          {{sender.first_name}} {{sender.last_name}} se ha comunicado contigo: <br>
+          El/la {{ role }} {{sender.first_name}} {{sender.last_name}}, {% if degree %} de {{degree}} {%endif%} se ha comunicado contigo: <br>
           "Hola {{receiver.username}}, {{action}} {{int_type}} en {{subject}}. Pongámonos en contacto! <br>
           Te dejo mi correo: {{sender.email}} <br>
           Espero tu respuesta!"<br><br>

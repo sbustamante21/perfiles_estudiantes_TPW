@@ -11,15 +11,20 @@
 <section style="background-color: #eee;">
     <div class="container py-5">
         <div class="row">
-        <div class="col-lg-5">
+        <div class="col col-lg-5 col-md-12 col-sm-12">
           <div class="card mb-4">
             <div class="card-body text-center">
                 {% if role == "Estudiante" and pfp %}
+                <a href="" data-bs-toggle="modal" data-bs-target="#pfpmodal">
                   <img src = {{pfp.url}} alt="hola"
-                  class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
+                  class="rounded-circle img-fluid" style="width: 150px;">
+                </a>
                 {% else %}
+
+                <a href="" data-bs-toggle="modal" data-bs-target="#pfpmodal">
                   <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
-                class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
+                class="rounded-circle img-fluid" style="width: 150px;">
+                </a>
                 {% endif %}
               <h5 class="my-3">{{user.first_name}} {{user.last_name}}</h5>
               {% if role == "Estudiante"%}
@@ -53,7 +58,17 @@
             <div class="card mb-4 mb-lg-0">
                 <div class="card-body p-0">
                   <div class="card-header text-center">
-                    HISTORIAL DEL ESTUDIANTE
+                    <strong>MIS TRABAJOS</strong>
+                    
+                    {%if user == request.user%}
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#historialmodal">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                      </svg>
+                    </button>
+
+                    {%endif%}
                   </div>
                     <table class="table text-center">
                       <thead>
@@ -61,7 +76,7 @@
                           {% for field in fields %}
                             <th scope="col">{{ field }}</th>
                           {% endfor %}
-                          <th>eliminar</th>
+                          <th>Eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,7 +91,11 @@
                                       {% csrf_token %}
                                       <input type="hidden" name="lista_hist">
                                       <input type="hidden" name="id" value="{{ his.id }}">
-                                      <button class="btn btn-danger" onclick="return confirm('¿Está seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
+                                      <button type="button" class="btn btn-outline-danger" onclick="return confirm('¿Está seguro que desea eliminar?')" type="submit" name="eliminar" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                        </svg>
+                                      </button>
                                   </form>
                                 {% endif %}
                               </td>
@@ -87,11 +106,6 @@
                 </div>
             </div>
             <br>
-            {%if user == request.user%}
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#historialmodal">
-              Añadir historial
-            </button>
-            {%endif%}
           {% endif %}
         </div>
         <div class="col-lg-7">
@@ -170,6 +184,16 @@
           {%if role == "Estudiante" %}
           
           <div class="row">
+
+            <h5>MIS INTERESES {%if user == request.user%}
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#añadirramosmodal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                </svg>
+              </button>
+            {% endif %}</h5>
+
             <div class="row-md-4">
                 <div class="card mb-4 mb-md-0">
                   <div class="card-header">
@@ -186,7 +210,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="lista_tutor">
                                 <input type="hidden" name="id" value="{{ tutor.id }}">
-                                <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Seguro que desea eliminar?')" name="eliminar">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                  <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                  </svg>
+                                </button>
                               </form>
                               {%endif%}
                             </li>
@@ -213,7 +241,11 @@
                               {% csrf_token %}
                               <input type="hidden" name="lista_ayud">
                               <input type="hidden" name="id" value="{{ ayud.id }}">
-                              <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
+                              <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Seguro que desea eliminar?')" name="eliminar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                </svg>
+                              </button>
                             </form>
                             {%endif%}
                           </li>
@@ -240,7 +272,11 @@
                           {% csrf_token %}
                           <input type="hidden" name="lista_aux">
                           <input type="hidden" name="id" value="{{ help.id }}">
-                          <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
+                          <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Seguro que desea eliminar?')" name="eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                            </svg>
+                          </button>
                         </form>
                         {%endif%}
                       </li>
@@ -253,11 +289,6 @@
           </div>
         <br>
 
-        {%if user == request.user%}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#añadirramosmodal">
-          Añadir o eliminar ramos
-        </button>
-        {% endif %}
         {% endif %}
     </div>
 </div>

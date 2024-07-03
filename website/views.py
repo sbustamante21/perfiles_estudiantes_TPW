@@ -45,8 +45,7 @@ from .models import (
     Contact,
 )
 
-from math import ceil
-from .decorators import role_required
+from .decorators import role_required, anonymous_required
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.forms import PasswordChangeForm
 
@@ -113,7 +112,6 @@ def main_page(request):
             receiver = User.objects.get(id=request.POST.get("id_receiver"))
             message_form = MessageForm(request.POST, user=request.user)
             if message_form.is_valid():
-                # sender_email, receiver, int_type, subj
                 send_custom_email(
                     request.user,
                     receiver,
@@ -121,12 +119,10 @@ def main_page(request):
                     message_form.cleaned_data.get("subject"),
                 )
 
-    nrows = ceil(len(students) / 3)
     context = {
         "search_form": form,
         "students": students,
         "cant": len(students),
-        "nrows": [i for i in range(nrows)],
         "message_form": message_form,
     }
 
@@ -313,7 +309,7 @@ def admin_page(request, modelo=None):
 
     return render(request, "website/admin_page.html", context)
 
-
+@anonymous_required(redirect_url="/main_page/")
 def do_login(request):
     if request.method == "POST":
         form = AuthenticationFormWithInactiveUsersOkay(data=request.POST)
@@ -435,7 +431,6 @@ def profile_page(request, id_user=None):
         context = {"user": user, "role": "Docente"}
 
     return render(request, "website/profile_page.html", context)
-
 
 def do_logout(request):
     if request.user.is_authenticated:
@@ -617,15 +612,16 @@ def student_edit(request):
     )
 
 
-
+@anonymous_required(redirect_url="/main_page/")
 def welcome(request):
     return render(request, "website/welcome.html")
 
 
+@anonymous_required(redirect_url="/main_page/")
 def register(request):
     return render(request, "website/register.html")
 
-
+@anonymous_required(redirect_url="/main_page/")
 def student_register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
@@ -669,7 +665,7 @@ def student_register(request):
         },
     )
 
-
+@anonymous_required(redirect_url="/main_page/")
 def professor_register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
