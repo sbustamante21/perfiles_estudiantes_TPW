@@ -43,13 +43,13 @@
                                 <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'estudiante' %}">Estudiante</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'tipo_periodo' %}">Tipo Periodo</a>
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'tipo_periodo' %}">Tipo Período</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'plan_curricular' %}">Plan Curricular</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'tipo_interes' %}">Tipo de interes</a>
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'tipo_interes' %}">Tipo Interés</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'carrera' %}">Carrera</a>
@@ -65,7 +65,7 @@
                                 <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'curso' %}">Curso</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'interes' %}">Interes</a>
+                                <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'interes' %}">Interés</a>
                             </li>
                           
                         {% elif request.user.role != user.ADMIN %}
@@ -76,18 +76,12 @@
                                 <a class="nav-link active" aria-current="page" href="{%url 'profile_page' request.user.id%}">Mi perfil</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
+                                <a class="nav-link active" aria-current="page" href="{%url 'about_us'%}">Quiénes Somos</a>
                             </li>
                         {% endif %}
                     {%else%}
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Nosotros</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Contáctanos</a>
+                            <a class="nav-link active" aria-current="page" href="{%url 'about_us'%}">Quiénes Somos</a>
                         </li>
                     {% endif %}
                 </ul>

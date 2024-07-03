@@ -14,6 +14,7 @@ urlpatterns = [
     path("delete_user/", views.delete_user, name="delete_user"),
     path("admin_page/<str:modelo>/", views.admin_page, name="admin_page"),
     path("profile_page/<str:id_user>", views.profile_page, name="profile_page"),
+    #path("about_us/", views.about_us, name="about_us"),
     path("generate_pdf/<str:id_user>/", views.generate_pdf, name="generate_pdf"),
     path(
         "password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"
