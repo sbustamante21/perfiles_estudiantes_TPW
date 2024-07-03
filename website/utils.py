@@ -6,9 +6,7 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from datetime import datetime
 
-from .models import User
-
-from website.models import Contact
+from website.models import Contact, User
 
 from django.core.mail import EmailMessage
 
