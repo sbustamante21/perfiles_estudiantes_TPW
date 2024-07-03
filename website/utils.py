@@ -47,7 +47,9 @@ def render_to_pdf(template_src, context_dict={}):
 
 def generate_year_choices(start_year=2000):
     current_year = datetime.now().year
-    return [(year, year) for year in range(start_year, current_year + 1)]
+    year_choices = [('', '------')]
+    year_choices += [(year, year) for year in range(2000, current_year + 1)]
+    return year_choices
 
 # Enviar un correo entre un usuario y un
 def send_custom_email(sender, receiver, int_type, subj):
