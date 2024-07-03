@@ -333,7 +333,7 @@ def do_login(request):
         return render(request, "website/login.html", {"form": form})
 
 
-@role_required([User.PROFESSOR, User.STUDENT])
+@login_required
 def profile_page(request, id_user=None):
     user = User.objects.get(id=id_user)
 
@@ -432,6 +432,7 @@ def profile_page(request, id_user=None):
 
     return render(request, "website/profile_page.html", context)
 
+@login_required
 def do_logout(request):
     if request.user.is_authenticated:
         logout(request)
