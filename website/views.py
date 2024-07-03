@@ -48,6 +48,7 @@ from .models import (
 from math import ceil
 from .decorators import role_required
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth.forms import PasswordChangeForm
 
 # Create your views here.
 
@@ -509,8 +510,6 @@ def professor_edit(request):
             for field in editable_fields:
                 if field != "password1" and field != "password2":
                     setattr(user, field, user_form.cleaned_data[field])
-                else:
-                    user.set_password(user_form.cleaned_data["password1"])
             user.save()
             if user == request.user:
                 update_session_auth_hash(request, user)
@@ -527,6 +526,20 @@ def professor_edit(request):
         },
     )
 
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Actualiza la sesión del usuario si la contraseña ha cambiado
+            messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
+            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))  # Redirige a la página de perfil
+        else:
+            messages.error(request, 'Por favor corrige los errores indicados.')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'website/change_password.html', {'form': form})
 
 def student_edit(request):
 
@@ -575,8 +588,6 @@ def student_edit(request):
             for field in user_editable_fields:
                 if field != "password1" and field != "password2":
                     setattr(user, field, user_form.cleaned_data[field])
-                else:
-                    user.set_password(user_form.cleaned_data["password1"])
             user.save()
 
             for field in student_editable_fields:
@@ -604,6 +615,7 @@ def student_edit(request):
             "student_form": student_form,
         },
     )
+
 
 
 def welcome(request):

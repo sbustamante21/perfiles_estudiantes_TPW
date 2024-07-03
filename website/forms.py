@@ -84,9 +84,11 @@ class UserRegisterForm(UserCreationForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        # Accept 'instance' keyword argument
-        self.instance = kwargs.get("instance", None)
         super().__init__(*args, **kwargs)
+        # Oculta los campos de contraseña si se está editando un usuario existente
+        if kwargs.get('instance'):
+            self.fields.pop('password1')
+            self.fields.pop('password2')
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
@@ -475,7 +477,7 @@ class MessageForm(forms.Form):
     interest_type = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
-
+    
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super(MessageForm, self).__init__(*args, **kwargs)
