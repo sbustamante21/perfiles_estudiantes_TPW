@@ -790,5 +790,8 @@ def generate_pdf(request, id_user=None):
         return response
     return HttpResponse("Error generating PDF")
 
+def about_us(request):
+    return render(request, 'website/about_us.html')
+
 def custom_404(request, exception):
     return render(request, 'custom_404.html', status=404)
