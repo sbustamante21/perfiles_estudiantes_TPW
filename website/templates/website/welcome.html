@@ -2,11 +2,14 @@
 {% load bootstrap5 %}
 {% block content %}
 <section class="mt-5 pt-5">
-    <div class="container">
-        <h1>Bienvenido</h1>
-        <div class="options">
+    <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold text-body-emphasis">Bienvenido</h1>
+        <div class="col-lg-6 mx-auto">
+          <p class="lead mb-4">Inicie sesión o registrate para empezar.</p>
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
             <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
             <a href="{% url 'register' %}" class="btn btn-secondary">Registrarse</a>
+          </div>
         </div>
     </div>
 </section>

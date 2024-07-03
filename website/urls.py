@@ -35,4 +35,5 @@ urlpatterns = [
     ),
     path("professor_edit/", views.professor_edit, name="professor_edit"),
     path("student_edit/", views.student_edit, name="student_edit"),
+    path("send_email/", views.send_custom_email, name="send_custom_email"),
 ]
