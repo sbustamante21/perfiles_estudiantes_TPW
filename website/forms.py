@@ -14,7 +14,7 @@ from .models import (
 )
 from django.core.validators import MaxValueValidator
 import datetime
-
+from .utils import generate_year_choices
 
 class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
     def confirm_login_allowed(self, user):
@@ -22,7 +22,6 @@ class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
             raise forms.ValidationError(
                 "Cuenta inactiva. Por favor, comuníquese con los administradores: sbustamante21@alumnos.utalca.cl, mlolas19@alumnos.utalca.cl, cecastillo19@alumnos.utalca.cl"
             )
-
 
 class StudentHistory(forms.ModelForm):
     NUMBER_CHOICES = [
@@ -33,13 +32,17 @@ class StudentHistory(forms.ModelForm):
     interest_type_id = forms.ModelChoiceField(
         queryset=InterestType.objects.exclude(name="AUXILIO"), required=True
     )
-    year = forms.IntegerField(required=True)
+    year = forms.ChoiceField(
+        choices=generate_year_choices(),
+        required=True,
+        label='Año'
+    )
     period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
     student_id = forms.ModelChoiceField(
         queryset=Student.objects.all(),
         required=False,
         disabled=True,
-        widget=forms.Select(attrs={"class": "hidden"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -84,9 +87,11 @@ class UserRegisterForm(UserCreationForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        # Accept 'instance' keyword argument
-        self.instance = kwargs.get("instance", None)
         super().__init__(*args, **kwargs)
+        # Oculta los campos de contraseña si se está editando un usuario existente
+        if kwargs.get('instance'):
+            self.fields.pop('password1')
+            self.fields.pop('password2')
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
@@ -112,6 +117,17 @@ class UserRegisterForm(UserCreationForm):
         return email
 
 
+class UserPasswordUpdateFormAdmin(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ["password"]
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.get("instance", None)
+        super(UserPasswordUpdateFormAdmin, self).__init__(*args, **kwargs)
+
+
 class UserRegisterFormAdmin(forms.ModelForm):
     username = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(required=True)
@@ -119,7 +135,6 @@ class UserRegisterFormAdmin(forms.ModelForm):
     last_name = forms.CharField(max_length=30, required=True)
     is_active = forms.BooleanField(required=False, initial=True, label="Activo")
     role = forms.ChoiceField(choices=User.ROLE_CHOICES, label="Rol")
-    password = forms.CharField(max_length=100, required=True)
 
     class Meta:
         model = User
@@ -132,6 +147,7 @@ class UserRegisterFormAdmin(forms.ModelForm):
             "is_active",
             "role",
         ]
+        exclude = ["password"]
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get("instance", None)
@@ -155,7 +171,11 @@ class UserRegisterFormAdmin(forms.ModelForm):
 
 
 class StudentRegisterForm(forms.ModelForm):
-    admission_year = forms.IntegerField(required=True)
+    admission_year = forms.ChoiceField(
+        choices=generate_year_choices(),
+        required=True,
+        label='Año de Ingreso'
+    )
     personal_mail = forms.EmailField(required=False)
     phone_number = forms.IntegerField(required=False)
     curriculum_plan_id = forms.ModelChoiceField(
@@ -431,7 +451,7 @@ class StudentInterest(forms.ModelForm):
         queryset=Student.objects.all(),
         required=False,
         disabled=True,
-        widget=forms.Select(attrs={"class": "hidden"}),
+        widget=forms.HiddenInput(),
     )
 
     class Meta:
@@ -455,17 +475,25 @@ class SearchForm(forms.Form):
         queryset=InterestType.objects.all(), required=False
     )
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
-    admission_year = forms.IntegerField(required=False, label='Año Ingreso')
+    admission_year = forms.ChoiceField(
+        choices=generate_year_choices(),
+        required=True,
+        label='Año de Ingreso'
+    )
     # se pueden agregar mas filtros...
 
 
 class MessageForm(forms.Form):
-    HELP_CHOICES = [
-        ("option1", "Una ayuda, por favor!"),
-        ("option2", "Necesito ayuda con esto"),
-        ("option3", "Me ayudas?"),
-    ]
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
     interest_type = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user")
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        if user.role == User.PROFESSOR:
+            self.fields["interest_type"].queryset = InterestType.objects.filter(name="AYUDANTIA")
+        elif user.role == User.STUDENT:
+            self.fields["interest_type"].queryset = InterestType.objects.exclude(name="AYUDANTIA")

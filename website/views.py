@@ -10,8 +10,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
 from django.db.models import Q, Subquery, OuterRef
-from django.core.mail import send_mail
-from .utils import render_to_pdf
+from .utils import render_to_pdf, send_custom_email
 from .forms import (
     StudentRegisterForm,
     UserRegisterForm,
@@ -31,6 +30,7 @@ from .forms import (
     InterestFormAdmin,
     SearchForm,
     MessageForm,
+    UserPasswordUpdateFormAdmin,
 )
 from .models import (
     Student,
@@ -48,6 +48,7 @@ from .models import (
 from math import ceil
 from .decorators import role_required
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth.forms import PasswordChangeForm
 
 # Create your views here.
 
@@ -59,7 +60,7 @@ def main_page(request):
     students = Student.objects.all()
     interests = Interest.objects.all()
     form = SearchForm()
-    message_form = MessageForm()
+    message_form = MessageForm(user=request.user)
 
     if request.method == "POST":
         if "search_form" in request.POST:
@@ -110,36 +111,15 @@ def main_page(request):
 
         elif "message_form" in request.POST:
             receiver = User.objects.get(id=request.POST.get("id_receiver"))
-            message_form = MessageForm(request.POST)
+            message_form = MessageForm(request.POST, user=request.user)
             if message_form.is_valid():
-                int_type = message_form.cleaned_data.get("interest_type")
-
-                if int_type.name == "AUXILIO":
-                    action = "necesito"
-                else:
-                    action = "ofrezco"
-
-                subj = message_form.cleaned_data.get("subject")
-                title = f"Contacto sobre {int_type} de {subj}"
-                message = (
-                    f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
+                # sender_email, receiver, int_type, subj
+                send_custom_email(
+                    request.user,
+                    receiver,
+                    message_form.cleaned_data.get("interest_type"),
+                    message_form.cleaned_data.get("subject"),
                 )
-                message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
-                message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
-                sender_email = "sebastian.bustamante.2k3@gmail.com"
-                receiver_email = [receiver.email]
-
-                send_mail(title, message, sender_email, receiver_email)
-
-                # Guardar en la tabla de contacto la interaccion
-                new_contact = Contact(
-                    message=message,
-                    message_type_id=int_type,
-                    subject_id=subj,
-                    receiver_id=receiver,
-                    sender_id=request.user,
-                )
-                new_contact.save()
 
     nrows = ceil(len(students) / 3)
     context = {
@@ -195,7 +175,6 @@ def admin_page(request, modelo=None):
         ],
         "usuario": [
             "id",
-            "password",
             "username",
             "first_name",
             "last_name",
@@ -238,7 +217,6 @@ def admin_page(request, modelo=None):
             "curriculum_plan_id",
         ],
         "usuario": [
-            "password",
             "username",
             "first_name",
             "last_name",
@@ -267,6 +245,7 @@ def admin_page(request, modelo=None):
 
     model = models[modelo]
     form_model = forms[modelo]
+    password_form = UserPasswordUpdateFormAdmin()
     objs = model.objects.all()
     all_field_names = fields[modelo]
     form = form_model()
@@ -289,17 +268,15 @@ def admin_page(request, modelo=None):
             editing = True
             id = obj.id
 
-        elif "guardar" in request.POST:
+        elif "guardar" in request.POST and not "password_form" in request.POST:
             # form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
                 form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
-                        if field != "password" and field != "pfp":
+                        if field != "pfp":
                             setattr(obj, field, form.cleaned_data[field])
-                        elif field == "password":
-                            obj.set_password(form.cleaned_data[field])
                         elif field == "pfp":
                             if form.cleaned_data.get("pfp") is False:
                                 setattr(obj, field, None)
@@ -312,7 +289,15 @@ def admin_page(request, modelo=None):
                 form = form_model(request.POST, request.FILES)
                 if form.is_valid():
                     form.save()
-                    form = form_model()
+
+        elif "password_form" in request.POST:
+            password_form = UserPasswordUpdateFormAdmin(request.POST)
+            obj = model.objects.get(id=request.POST.get("id_receiver"))
+            if password_form.is_valid():
+                obj.set_password(password_form.cleaned_data["password"])
+                obj.save()
+            password_form = UserPasswordUpdateFormAdmin()
+                
 
     context = {
         "model": model,
@@ -323,6 +308,7 @@ def admin_page(request, modelo=None):
         "editing": editing,
         "id": id,
         "raw_fields": all_field_names,
+        "password_form": UserPasswordUpdateFormAdmin(),
     }
 
     return render(request, "website/admin_page.html", context)
@@ -357,7 +343,7 @@ def profile_page(request, id_user=None):
 
     if user.role == user.STUDENT:
         degree = user.student.degree_id
-        message_form = MessageForm()
+        message_form = MessageForm(user=request.user)
         adm_year = user.student.admission_year
         pfp = user.student.pfp
         cplan = user.student.curriculum_plan_id
@@ -389,34 +375,14 @@ def profile_page(request, id_user=None):
 
             elif "message_form" in request.POST:
                 receiver = User.objects.get(id=request.POST.get("id_receiver"))
-                message_form = MessageForm(request.POST)
+                message_form = MessageForm(request.POST, user=request.user)
                 if message_form.is_valid():
-                    int_type = message_form.cleaned_data.get("interest_type")
-
-                    if int_type.name == "AUXILIO":
-                        action = "necesito"
-                    else:
-                        action = "ofrezco"
-
-                    subj = message_form.cleaned_data.get("subject")
-                    title = f"Contacto sobre {int_type} de {subj}"
-                    message = f"{request.user.username} de LINK-ICB te ha enviado un mensaje.\n"
-                    message += f"Hola, {receiver.username}, {action} {int_type} de {subj}.\nPongámonos en contacto!"
-                    message += "\n" + "Este es un mensaje autogenerado por LINK-ICB."
-                    sender_email = "sebastian.bustamante.2k3@gmail.com"
-                    receiver_email = [receiver.email]
-
-                    send_mail(title, message, sender_email, receiver_email)
-
-                    # Guardar en la tabla de contacto la interaccion
-                    new_contact = Contact(
-                        message=message,
-                        message_type_id=int_type,
-                        subject_id=subj,
-                        receiver_id=receiver,
-                        sender_id=request.user,
+                    send_custom_email(
+                        request.user,
+                        receiver,
+                        message_form.cleaned_data.get("interest_type"),
+                        message_form.cleaned_data.get("subject"),
                     )
-                    new_contact.save()
 
             if "eliminar" in request.POST:
                 model.objects.get(id=request.POST.get("id")).delete()
@@ -544,8 +510,6 @@ def professor_edit(request):
             for field in editable_fields:
                 if field != "password1" and field != "password2":
                     setattr(user, field, user_form.cleaned_data[field])
-                else:
-                    user.set_password(user_form.cleaned_data["password1"])
             user.save()
             if user == request.user:
                 update_session_auth_hash(request, user)
@@ -562,6 +526,20 @@ def professor_edit(request):
         },
     )
 
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Actualiza la sesión del usuario si la contraseña ha cambiado
+            messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
+            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))  # Redirige a la página de perfil
+        else:
+            messages.error(request, 'Por favor corrige los errores indicados.')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'website/change_password.html', {'form': form})
 
 def student_edit(request):
 
@@ -610,8 +588,6 @@ def student_edit(request):
             for field in user_editable_fields:
                 if field != "password1" and field != "password2":
                     setattr(user, field, user_form.cleaned_data[field])
-                else:
-                    user.set_password(user_form.cleaned_data["password1"])
             user.save()
 
             for field in student_editable_fields:
@@ -639,6 +615,7 @@ def student_edit(request):
             "student_form": student_form,
         },
     )
+
 
 
 def welcome(request):
@@ -794,4 +771,4 @@ def about_us(request):
     return render(request, 'website/about_us.html')
 
 def custom_404(request, exception):
-    return render(request, 'custom_404.html', status=404)
+    return render(request, "custom_404.html", status=404)
