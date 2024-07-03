@@ -57,9 +57,9 @@
                     <li class="nav-item">
                         <div class="dropdown px-5">
                             <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
-                                {% if request.user.role == user.STUDENT %}
+                                {% if request.user.role == user.STUDENT and request.user.student.pfp %}
                                     <img src="{{request.user.student.pfp.url}}" alt="pfp" width="32" height="32" class="rounded-circle me-2">
-                                {% elif request.user.role == user.PROFESSOR or request.user.role == user.ADMIN %}
+                                {% elif request.user.role == user.PROFESSOR or request.user.role == user.ADMIN or not request.user.student.pfp%}
                                     <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="pfp" width="32" height="32" class="rounded-circle me-2">
                                 {%endif%}
                                 <strong>{{request.user.username}} - {{role}}</strong>
