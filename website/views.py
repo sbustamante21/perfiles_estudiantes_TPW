@@ -31,7 +31,6 @@ from .forms import (
     InterestFormAdmin,
     SearchForm,
     MessageForm,
-    PasswordChangeCustomForm
 )
 from .models import (
     Student,
@@ -569,7 +568,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Actualiza la sesión del usuario si la contraseña ha cambiado
             messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
-            return redirect('profile_page')  # Redirige a la página de perfil
+            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))  # Redirige a la página de perfil
         else:
             messages.error(request, 'Por favor corrige los errores indicados.')
     else:

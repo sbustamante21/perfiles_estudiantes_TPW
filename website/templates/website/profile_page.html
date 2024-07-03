@@ -36,6 +36,7 @@
                 <a  href="{% url 'generate_pdf' user.id %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar curriculum</a>
                 {%endif%}
                 {% if user == request.user%}
+                <a  href="{% url 'change_password' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Actualizar Contraseña</a>
                 <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
                 {% endif %}
                 {% if role == "Docente" %}
@@ -43,6 +44,7 @@
                 {% elif role == "Estudiante" and user == request.user %}
                   <a  href="{% url 'student_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
                 {% endif %}
+
               </div>
             </div>
           </div>          

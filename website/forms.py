@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import (
     Student,
     CurriculumPlan,
@@ -471,22 +471,4 @@ class MessageForm(forms.Form):
     interest_type = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
-    
-class PasswordChangeCustomForm(PasswordChangeForm):
-    old_password = forms.CharField(
-        label="Old Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        strip=False,
-    )
-    new_password1 = forms.CharField(
-        label="New Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        strip=False,
-        help_text="Enter your new password.",
-    )
-    new_password2 = forms.CharField(
-        label="New Password confirmation",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        strip=False,
-        help_text="Enter the same password as before, for verification.",
-    )
+
