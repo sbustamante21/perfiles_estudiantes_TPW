@@ -35,4 +35,5 @@ urlpatterns = [
     ),
     path("professor_edit/", views.professor_edit, name="professor_edit"),
     path("student_edit/", views.student_edit, name="student_edit"),
+    path("change_password/", views.change_password, name="change_password"),
 ]
