@@ -113,24 +113,28 @@
                 </div>
               </div>
               {% if role == "Estudiante" %}
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Correo Personal</p>
+                {% if user.personal_mail %}
+                <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Correo Personal</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p class="text-muted mb-0">{{user.personal_mail}}</p>
+                  </div>
                 </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{user.personal_mail}}</p>
+                {% endif %}
+                {% if user.phone_number %}
+                <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Celular</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p class="text-muted mb-0">{{user.phone_number}}</p>
+                  </div>
                 </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Celular</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{user.phone_number}}</p>
-                </div>
-              </div>
+                {% endif %}
               <hr>
               <div class="row">
                 <div class="col-sm-3">

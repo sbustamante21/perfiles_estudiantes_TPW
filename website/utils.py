@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
+from datetime import datetime
 
 def link_callback(uri, rel):
     """
@@ -37,3 +38,7 @@ def render_to_pdf(template_src, context_dict={}):
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type="application/pdf")
     return None
+
+def generate_year_choices(start_year=2000):
+    current_year = datetime.now().year
+    return [(year, year) for year in range(start_year, current_year + 1)]

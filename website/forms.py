@@ -14,7 +14,7 @@ from .models import (
 )
 from django.core.validators import MaxValueValidator
 import datetime
-
+from .utils import generate_year_choices
 
 class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
     def confirm_login_allowed(self, user):
@@ -22,7 +22,6 @@ class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
             raise forms.ValidationError(
                 "Cuenta inactiva. Por favor, comuníquese con los administradores: sbustamante21@alumnos.utalca.cl, mlolas19@alumnos.utalca.cl, cecastillo19@alumnos.utalca.cl"
             )
-
 
 class StudentHistory(forms.ModelForm):
     NUMBER_CHOICES = [
@@ -33,7 +32,11 @@ class StudentHistory(forms.ModelForm):
     interest_type_id = forms.ModelChoiceField(
         queryset=InterestType.objects.exclude(name="AUXILIO"), required=True
     )
-    year = forms.IntegerField(required=True)
+    year = forms.ChoiceField(
+        choices=generate_year_choices(),
+        required=True,
+        label='Año'
+    )
     period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
     student_id = forms.ModelChoiceField(
         queryset=Student.objects.all(),
@@ -155,7 +158,11 @@ class UserRegisterFormAdmin(forms.ModelForm):
 
 
 class StudentRegisterForm(forms.ModelForm):
-    admission_year = forms.IntegerField(required=True)
+    admission_year = forms.ChoiceField(
+        choices=generate_year_choices(),
+        required=True,
+        label='Año de Ingreso'
+    )
     personal_mail = forms.EmailField(required=False)
     phone_number = forms.IntegerField(required=False)
     curriculum_plan_id = forms.ModelChoiceField(
@@ -455,7 +462,11 @@ class SearchForm(forms.Form):
         queryset=InterestType.objects.all(), required=False
     )
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
-    admission_year = forms.IntegerField(required=False, label='Año Ingreso')
+    admission_year = forms.ChoiceField(
+        choices=generate_year_choices(),
+        required=True,
+        label='Año de Ingreso'
+    )
     # se pueden agregar mas filtros...
 
 
