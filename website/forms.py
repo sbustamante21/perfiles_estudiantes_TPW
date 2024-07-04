@@ -176,10 +176,11 @@ class StudentRegisterForm(forms.ModelForm):
     )
     personal_mail = forms.EmailField(required=False, label="Correo personal")
     phone_number = forms.IntegerField(required=False, label="Número de teléfono")
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera",
+    widget=forms.Select(attrs={"hx-get":"../load_cplans", "hx-target":"#id_curriculum_plan_id"}))
     curriculum_plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.all(), required=True, label="Plan curricular"
+        queryset=CurriculumPlan.objects.none(), required=True, label="Plan curricular"
     )
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera")
 
     class Meta:
         model = Student
@@ -197,6 +198,10 @@ class StudentRegisterForm(forms.ModelForm):
         self.instance = kwargs.get("instance", None)
         self.user = kwargs.pop("user", None)
         super(StudentRegisterForm, self).__init__(*args, **kwargs)
+
+        if "degree_id" in self.data:
+            degree_id = int(self.data.get("degree_id"))
+            self.fields["curriculum_plan_id"].queryset = CurriculumPlan.objects.filter(degree_id=degree_id)
 
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
@@ -375,11 +380,13 @@ class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True, label="Año de ingreso")
     personal_mail = forms.EmailField(required=False, label="Correo personal")
     phone_number = forms.IntegerField(required=False, label="Número de teléfono")
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera"
+    widget=forms.Select(attrs={"hx-get":"../../../load_cplans", "hx-target":"#id_curriculum_plan_id"}))
     curriculum_plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.all(), required=True, label="Plan curricular"
+        queryset=CurriculumPlan.objects.none(), required=True, label="Plan curricular"
     )
+
     user = forms.ModelChoiceField(queryset=User.objects.all(), required=True, label="Nombre de Usuario")
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera")
     pfp = forms.ImageField(required=False, label="Foto de perfil")
 
     class Meta:
@@ -397,6 +404,10 @@ class StudentRegisterFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get("instance", None)
         super(StudentRegisterFormAdmin, self).__init__(*args, **kwargs)
+
+        if "degree_id" in self.data:
+            degree_id = self.data.get("degree_id")
+            self.fields["curriculum_plan_id"].queryset = CurriculumPlan.objects.filter(degree_id=degree_id)
 
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
