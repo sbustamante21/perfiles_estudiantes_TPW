@@ -1,0 +1,7 @@
+.navbar-nav .nav-link:hover {
+    text-decoration: underline;
+}
+
+nav ul li:hover {
+    text-decoration: underline;
+}

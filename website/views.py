@@ -120,8 +120,14 @@ def main_page(request):
                     message_form.cleaned_data.get("subject"),
                 )
 
+    paginator = Paginator(students, 9)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
         "search_form": form,
+        "page_obj": page_obj,
+        "cant_pag": paginator.count,
         "students": students,
         "cant": len(students),
         "message_form": message_form,
