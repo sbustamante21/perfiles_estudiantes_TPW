@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% if title %} {{title}} {% else %} Link-ICB {% endif %}</title>
+    <title>{%block title%}Link-ICB{%endblock%}</title>
     {% bootstrap_css %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'website/style.css' %}">
@@ -30,6 +30,7 @@
 
     {% block content %}
     {% endblock %}
+    
     {% bootstrap_javascript %}
     <script src="{% static 'website/main.js' %}"></script>
 </body>
