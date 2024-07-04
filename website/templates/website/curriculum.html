@@ -55,25 +55,25 @@
                   <p class="text-muted mb-0">{{user.email}}</p>
                 </div>
               </div>
-              {% if user.personal_mail %}
+              {% if user.student.personal_mail %}
                 <hr>
                 <div class="row">
                   <div class="col-sm-3">
                     <p class="mb-0">Correo personal</p>
                   </div>
                   <div class="col-sm-9">
-                    <p class="text-muted mb-0">{{user.personal_mail}}</p>
+                    <p class="text-muted mb-0">{{user.student.personal_mail}}</p>
                   </div>
                 </div>
               {% endif %}
-              {% if user.phone_number %}
+              {% if user.student.phone_number %}
                 <hr>
                 <div class="row">
                   <div class="col-sm-3">
                     <p class="mb-0">Celular</p>
                   </div>
                   <div class="col-sm-9">
-                    <p class="text-muted mb-0">{{user.phone_number}}</p>
+                    <p class="text-muted mb-0">{{user.student.phone_number}}</p>
                   </div>
                 </div>
               {% endif %}

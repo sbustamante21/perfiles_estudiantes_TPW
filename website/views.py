@@ -32,6 +32,7 @@ from .forms import (
     SearchForm,
     MessageForm,
     UserPasswordUpdateFormAdmin,
+    UserEditFormAdmin,
 )
 from .models import (
     Student,
@@ -265,15 +266,22 @@ def admin_page(request, modelo=None):
 
         elif "editar" in request.POST:
             obj = model.objects.get(id=request.POST.get("id"))
-            form = form_model(instance=obj)
+
+            if modelo == "usuario":
+                form = UserEditFormAdmin(instance=obj)
+            else:
+                form = form_model(instance=obj)
             editing = True
             id = obj.id
 
         elif "guardar" in request.POST and not "password_form" in request.POST:
-            #form = form_model(request.POST) # Se redeclara el form?
+            # form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
-                form = form_model(request.POST, request.FILES, instance=obj)
+                if modelo == "usuario":
+                    form = UserEditFormAdmin(request.POST, request.FILES, instance=obj)
+                else:
+                    form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
                         if field != "pfp":
@@ -292,13 +300,15 @@ def admin_page(request, modelo=None):
                     form.save()
 
         elif "password_form" in request.POST:
+            print("hola como estan")
+            print(f"HOLA 2: {request.POST.get("id_receiver")}")
             password_form = UserPasswordUpdateFormAdmin(request.POST)
             obj = model.objects.get(id=request.POST.get("id_receiver"))
+
             if password_form.is_valid():
                 obj.set_password(password_form.cleaned_data["password"])
                 obj.save()
             password_form = UserPasswordUpdateFormAdmin()
-                
 
     context = {
         "model": model,
@@ -314,6 +324,7 @@ def admin_page(request, modelo=None):
     }
 
     return render(request, "website/admin_page.html", context)
+
 
 @anonymous_required(redirect_url="/main_page/")
 def do_login(request):
@@ -438,6 +449,7 @@ def profile_page(request, id_user=None):
 
     return render(request, "website/profile_page.html", context)
 
+
 @login_required
 def do_logout(request):
     if request.user.is_authenticated:
@@ -528,20 +540,26 @@ def professor_edit(request):
         },
     )
 
+
 def change_password(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Actualiza la sesión del usuario si la contraseña ha cambiado
-            messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
-            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))  # Redirige a la página de perfil
+            update_session_auth_hash(
+                request, user
+            )  # Actualiza la sesión del usuario si la contraseña ha cambiado
+            messages.success(request, "Tu contraseña ha sido cambiada correctamente.")
+            return redirect(
+                reverse(f"profile_page", kwargs={"id_user": user.id})
+            )  # Redirige a la página de perfil
         else:
-            messages.error(request, 'Por favor corrige los errores indicados.')
+            messages.error(request, "Por favor corrige los errores indicados.")
     else:
         form = PasswordChangeForm(request.user)
-    
-    return render(request, 'website/change_password.html', {'form': form})
+
+    return render(request, "website/change_password.html", {"form": form})
+
 
 def student_edit(request):
 
@@ -625,6 +643,7 @@ def welcome(request):
 def register(request):
     return render(request, "website/register.html")
 
+
 @anonymous_required(redirect_url="/main_page/")
 def student_register(request):
     if request.method == "POST":
@@ -668,6 +687,7 @@ def student_register(request):
             "student_form": student_form,
         },
     )
+
 
 @anonymous_required(redirect_url="/main_page/")
 def professor_register(request):
@@ -767,14 +787,17 @@ def generate_pdf(request, id_user=None):
         return response
     return HttpResponse("Error generating PDF")
 
+
 def about_us(request):
-    return render(request, 'website/about_us.html')
+    return render(request, "website/about_us.html")
+
 
 def custom_404(request, exception):
     return render(request, "custom_404.html", status=404)
+
 
 def load_cplans(request):
     degree_id = request.GET.get("degree_id")
     cplans = CurriculumPlan.objects.filter(degree_id=degree_id)
 
-    return render(request, "website/cplan_options.html", {"cplans":cplans})
+    return render(request, "website/cplan_options.html", {"cplans": cplans})

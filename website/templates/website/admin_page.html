@@ -6,8 +6,9 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" />
 
 <div class="container mt-5 pt-5">
-    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name }}
+    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name|model_translated }} <br>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#save_edit_modal">
+            Añadir
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
@@ -31,17 +32,18 @@
                             <td>{{ obj|attr:field|display_role:field }}</td>
                         {% endfor %}
                         <td>
+                            <div class="btn-group" role="group">
                             <form method="post" style="display:inline;" id="edit_form">
                                 {% csrf_token %}
                                 <input type="hidden" name="id" value="{{ obj.id }}">
-                                <button class = "btn btn-warning" type="submit" name="editar">
+                                <button class = "btn btn-warning mx-1" type="button" name="editar" data-bs-toggle="modal" data-bs-target="#save_edit_modal">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
                                         <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
                                     </svg>
                                 </button>
                             </form>
                             {% if model_name == "usuarios" %}
-                                <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#password_modal" class="btn btn-primary ms-1">Cambiar contraseña</button>
+                                <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#password_modal" class="btn btn-primary ms-1 mx-1">Cambiar contraseña</button>
                             {% endif %}
                             {% if obj != request.user %}
                                 <form method="post" style="display:inline;">
@@ -54,6 +56,7 @@
                                     </button>
                                 </form>
                             {% endif %}
+                        </div>
                         </td>
                     </tr>
                 {% endfor %}
@@ -72,7 +75,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" 
                         id="exampleModalLabel">
-                        {{model_name}}
+                        {{model_name|model_translated}}
                     </h5>
                     <button type="button" 
                             class="btn-close" 
@@ -85,25 +88,25 @@
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% bootstrap_form form %}
+                        <input type="hidden" name="editing" id="editingFlag" value="{{ editing }}">
+                        <input type="hidden" name="id" value="{{ id }}">
                         {% buttons %}
                             {% if editing == True %}
                                 <button class="btn btn-primary" type="submit" name="guardar">Actualizar</button>
                             {% else %}
                                 <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
                             {% endif %}
-                        {% endbuttons %}
-                        <input type="hidden" name="editing" value="{{ editing }}">
-                        <input type="hidden" name="id" value="{{ id }}">
-                        <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" 
+                            <button type="button" 
                             class="btn btn-secondary" 
                             data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
+                                Cerrar
+                            </button>
+                        {% endbuttons %}
+                    </form>
                 </div>
+                <script>
+                    $('id_form') buscar input -> 
+                </script>
             </div>
         </div>
 </div>
@@ -135,15 +138,13 @@
                     <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
                     {% buttons %}
                       <button class="btn btn-primary" type="submit" name="guardar">Cambiar contraseña</button>
-                    {% endbuttons %}
-                  </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" 
+                      <button type="button" 
                             class="btn btn-secondary" 
                             data-bs-dismiss="modal">
                         Cerrar
                     </button>
+                    {% endbuttons %}
+                  </form>
                 </div>
             </div>
         </div>
