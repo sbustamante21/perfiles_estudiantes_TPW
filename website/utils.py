@@ -6,7 +6,7 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from datetime import datetime
 
-from website.models import Contact
+from website.models import Contact, User
 
 from django.core.mail import EmailMessage
 
@@ -56,25 +56,38 @@ def send_custom_email(sender, receiver, int_type, subj):
 
     title = f"Contacto sobre {int_type.name} de {subj} en LinkICB"
 
+    if sender.role == User.STUDENT:
+        role = "Estudiante"
+    elif sender.role == User.PROFESSOR:
+        role = "Docente"
+    else: # Esto nunca debiera suceder pero igual va
+        role = "Admin"
+    
+    if role == "Estudiante":
+        degree = sender.student.degree_id.name
+    else:
+        degree = None
+
     context = {
         "sender": sender,
         "receiver": receiver,
         "int_type": int_type.name.lower(),
+        "role": role,
+        "degree":degree,
         "subject": subj,
         "title": title,
-        "action": "necesito" if int_type == "AUXILIO" else "ofrezco",
+        "action": "necesito" if int_type.name == "AUXILIO" else "ofrezco",
     }
 
     html_message = render_to_string("website/email_template.html", context)
 
     email = EmailMessage(title, html_message, "linkicb1@gmail.com", [receiver.email])
 
-    email.content_subtype = "html"  # This is required to send HTML email
+    email.content_subtype = "html"
     email.send()
 
     # Guardar en la tabla de contacto la interaccion
     new_contact = Contact(
-        message="",
         message_type_id=int_type,
         subject_id=subj,
         receiver_id=receiver,

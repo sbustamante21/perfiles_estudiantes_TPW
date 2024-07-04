@@ -11,88 +11,170 @@
 <section style="background-color: #eee;">
     <div class="container py-5">
         <div class="row">
-        <div class="col-lg-5">
+        <div class="col col-lg-5 col-md-12 col-sm-12">
           <div class="card mb-4">
             <div class="card-body text-center">
-                {% if role == "Estudiante" and pfp %}
-                  <img src = {{pfp.url}} alt="hola"
-                  class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
+                {% if role == "Estudiante" and pfp %} 
+                  <img src = {{pfp.url}} alt="hola" class="rounded-circle img-fluid" style="width: 150px;">
                 {% else %}
-                  <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar"
-                class="rounded-circle img-fluid" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#pfpmodal">
+                <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
                 {% endif %}
-              <h5 class="my-3">{{user.first_name}} {{user.last_name}}</h5>
+              <h5 class="my-3">{{user.first_name}} {{user.last_name}}
+                {% if user == request.user %}
+                  <div class="dropdown d-inline-block">
+                  <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-gear-fill" viewBox="0 0 16 16">
+                      <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                    </svg>
+                  </a>
+                  <ul class="dropdown-menu text-small shadow">
+                      {% if role == "Docente"%}
+                      <li><a class="dropdown-item" href="{%url 'professor_edit'%}">Editar Perfil</a></li>
+                      {% elif role == "Estudiante" %}
+                      <li><a class="dropdown-item" href="{%url 'student_edit'%}">Editar Perfil</a></li>
+                      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#pfpmodal">Cambiar Foto de Perfil</a></li>
+                      {% endif %}
+                      <li><a class="dropdown-item" href="{%url 'change_password'%}">Actualizar contraseña</a></li>
+                      <li><a class="dropdown-item" href="{%url 'delete_user'%}">Borrar cuenta</a></li>
+                  </ul>
+                </div>
+                {% endif %}
+              </h5>
               {% if role == "Estudiante"%}
                 <p class="text-muted mb-1">{{role}} de {{degree}}</p>
               {% elif role == "Docente" %}
                 <p class="text-muted mb-1">{{role}} en</p>
               {% endif %}
               <p class="text-muted mb-4">Universidad de Talca</p>
+
               <div class="d-flex justify-content-center mb-2">
                 {% if role == "Estudiante" and user != request.user %}
-                <button type="button" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">Mensaje</button>
+                <button type="button" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-primary ms-1">
+                  Mensaje
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-fill" viewBox="0 0 16 16">
+                    <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"></path>
+                </svg>
+                </button>
                 {% endif %}
                 {%if role == "Estudiante"%}
-                <a  href="{% url 'generate_pdf' user.id %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary ms-1">Generar currículum</a>
+                <a  href="{% url 'generate_pdf' user.id %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-danger ms-1">Currículum
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-pdf-fill" viewBox="0 0 16 16">
+                    <path d="M5.523 10.424q.21-.124.459-.238a8 8 0 0 1-.45.606c-.28.337-.498.516-.635.572l-.035.012a.3.3 0 0 1-.026-.044c-.056-.11-.054-.216.04-.36.106-.165.319-.354.647-.548m2.455-1.647q-.178.037-.356.078a21 21 0 0 0 .5-1.05 12 12 0 0 0 .51.858q-.326.048-.654.114m2.525.939a4 4 0 0 1-.435-.41q.344.007.612.054c.317.057.466.147.518.209a.1.1 0 0 1 .026.064.44.44 0 0 1-.06.2.3.3 0 0 1-.094.124.1.1 0 0 1-.069.015c-.09-.003-.258-.066-.498-.256M8.278 4.97c-.04.244-.108.524-.2.829a5 5 0 0 1-.089-.346c-.076-.353-.087-.63-.046-.822.038-.177.11-.248.196-.283a.5.5 0 0 1 .145-.04c.013.03.028.092.032.198q.008.183-.038.465z"/>
+                    <path fill-rule="evenodd" d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2m.165 11.668c.09.18.23.343.438.419.207.075.412.04.58-.03.318-.13.635-.436.926-.786.333-.401.683-.927 1.021-1.51a11.6 11.6 0 0 1 1.997-.406c.3.383.61.713.91.95.28.22.603.403.934.417a.86.86 0 0 0 .51-.138c.155-.101.27-.247.354-.416.09-.181.145-.37.138-.563a.84.84 0 0 0-.2-.518c-.226-.27-.596-.4-.96-.465a5.8 5.8 0 0 0-1.335-.05 11 11 0 0 1-.98-1.686c.25-.66.437-1.284.52-1.794.036-.218.055-.426.048-.614a1.24 1.24 0 0 0-.127-.538.7.7 0 0 0-.477-.365c-.202-.043-.41 0-.601.077-.377.15-.576.47-.651.823-.073.34-.04.736.046 1.136.088.406.238.848.43 1.295a20 20 0 0 1-1.062 2.227 7.7 7.7 0 0 0-1.482.645c-.37.22-.699.48-.897.787-.21.326-.275.714-.08 1.103"/>
+                  </svg>
+                </a>
                 {%endif%}
-                {% if user == request.user%}
-                <a  href="{% url 'change_password' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Actualizar Contraseña</a>
-                <a  href="{% url 'delete_user' %}" onclick="return confirm('Seguro que quiere eliminar su perfil?')" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-danger ms-1">Borrar perfil</a>
-                {% endif %}
-                {% if role == "Docente" %}
-                  <a  href="{% url 'professor_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
-                {% elif role == "Estudiante" and user == request.user %}
-                  <a  href="{% url 'student_edit' %}" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info ms-1">Editar perfil</a>
-                {% endif %}
-
               </div>
             </div>
           </div>          
 
           {% if role == "Estudiante" %}
-            <div class="card mb-4 mb-lg-0">
-                <div class="card-body p-0">
-                  <div class="card-header text-center">
-                    HISTORIAL DEL ESTUDIANTE
+          <div class="row">
+
+            <h5>MIS INTERESES {%if user == request.user%}
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#añadirramosmodal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                </svg>
+              </button>
+            {% endif %}</h5>
+
+            <div class="row-md-4">
+                <div class="card mb-4 mb-md-0">
+                  <div class="card-header">
+                  OFREZCO TUTORIA DE:
                   </div>
-                    <table class="table text-center">
-                      <thead>
-                        <tr>
-                          {% for field in fields %}
-                            <th scope="col">{{ field }}</th>
+                    <div class="card-body">
+                        <ul>
+                          {% for tutor in tutor_list %}
+                            {% for field in interest_fields %}
+                            <li>
+                              {{ tutor|attr:field }}
+                              {%if user == request.user%}
+                              <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="lista_tutor">
+                                <input type="hidden" name="id" value="{{ tutor.id }}">
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Seguro que desea eliminar?')" name="eliminar">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                  <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                  </svg>
+                                </button>
+                              </form>
+                              {%endif%}
+                            </li>
+                            {% endfor %}
                           {% endfor %}
-                          <th>eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                      {% for his in history %}
-                          <tr>
-                              {% for field in raw_fields %}
-                                  <td>{{ his|attr:field }}</td>
-                              {% endfor %}
-                              <td>
-                                {%if user == request.user%}
-                                  <form method="post" style="display:inline;">
-                                      {% csrf_token %}
-                                      <input type="hidden" name="lista_hist">
-                                      <input type="hidden" name="id" value="{{ his.id }}">
-                                      <button class="btn btn-danger" onclick="return confirm('¿Está seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
-                                  </form>
-                                {% endif %}
-                              </td>
-                          </tr>
-                      {% endfor %}
-                  </tbody>
-                    </table>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <br>
-            {%if user == request.user%}
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#historialmodal">
-              Añadir historial
-            </button>
-            {%endif%}
-          {% endif %}
+            <div class="row-md-4">
+              <div class="card mb-4 mb-md-0">
+                <div class="card-header">
+                OFREZCO AYUDANTIA DE:
+                </div>
+                  <div class="card-body">
+                      <ul>
+                        {% for ayud in ayud_list %}
+                          {% for field in interest_fields %}
+                          <li>
+                            {{ ayud|attr:field }}
+                            {%if user == request.user%}
+                            <form method="post" style="display:inline;">
+                              {% csrf_token %}
+                              <input type="hidden" name="lista_ayud">
+                              <input type="hidden" name="id" value="{{ ayud.id }}">
+                              <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Seguro que desea eliminar?')" name="eliminar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                </svg>
+                              </button>
+                            </form>
+                            {%endif%}
+                          </li>
+                          {% endfor %}
+                        {% endfor %}
+                      </ul>
+                  </div>
+              </div>
+            </div>
+            <br>
+            <div class="row-md-4">
+              <div class="card mb-4 mb-md-0">
+                <div class="card-header">
+                NECESITO AYUDA EN:
+                </div>
+                <div class="card-body">
+                  <ul>
+                    {% for help in help_list %}
+                      {% for field in interest_fields %}
+                      <li>
+                        {{ help|attr:field }}
+                        {%if user == request.user%}
+                        <form method="post" style="display:inline;">
+                          {% csrf_token %}
+                          <input type="hidden" name="lista_aux">
+                          <input type="hidden" name="id" value="{{ help.id }}">
+                          <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Seguro que desea eliminar?')" name="eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                            </svg>
+                          </button>
+                        </form>
+                        {%endif%}
+                      </li>
+                      {% endfor %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>            
+            </div>
+          </div>
+        <br>
+        {% endif %}
         </div>
         <div class="col-lg-7">
           <div class="card mb-4">
@@ -168,96 +250,60 @@
             </div>
           </div>
           {%if role == "Estudiante" %}
-          
-          <div class="row">
-            <div class="row-md-4">
-                <div class="card mb-4 mb-md-0">
-                  <div class="card-header">
-                  OFREZCO TUTORIA DE:
-                  </div>
-                    <div class="card-body">
-                        <ul>
-                          {% for tutor in tutor_list %}
-                            {% for field in interest_fields %}
-                            <li>
-                              {{ tutor|attr:field }}
-                              {%if user == request.user%}
-                              <form method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="lista_tutor">
-                                <input type="hidden" name="id" value="{{ tutor.id }}">
-                                <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
-                              </form>
-                              {%endif%}
-                            </li>
-                            {% endfor %}
-                          {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="row-md-4">
-              <div class="card mb-4 mb-md-0">
-                <div class="card-header">
-                OFREZCO AYUDANTIA DE:
-                </div>
-                  <div class="card-body">
-                      <ul>
-                        {% for ayud in ayud_list %}
-                          {% for field in interest_fields %}
-                          <li>
-                            {{ ayud|attr:field }}
-                            {%if user == request.user%}
-                            <form method="post" style="display:inline;">
-                              {% csrf_token %}
-                              <input type="hidden" name="lista_ayud">
-                              <input type="hidden" name="id" value="{{ ayud.id }}">
-                              <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
-                            </form>
-                            {%endif%}
-                          </li>
-                          {% endfor %}
-                        {% endfor %}
-                      </ul>
-                  </div>
-              </div>
-            </div>
-            <br>
-            <div class="row-md-4">
-              <div class="card mb-4 mb-md-0">
-                <div class="card-header">
-                NECESITO AYUDA EN:
-                </div>
-                <div class="card-body">
-                  <ul>
-                    {% for help in help_list %}
-                      {% for field in interest_fields %}
-                      <li>
-                        {{ help|attr:field }}
-                        {%if user == request.user%}
-                        <form method="post" style="display:inline;">
-                          {% csrf_token %}
-                          <input type="hidden" name="lista_aux">
-                          <input type="hidden" name="id" value="{{ help.id }}">
-                          <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">Eliminar</button>
-                        </form>
-                        {%endif%}
-                      </li>
-                      {% endfor %}
-                    {% endfor %}
-                  </ul>
-                </div>
-              </div>            
-            </div>
-          </div>
-        <br>
 
-        {%if user == request.user%}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#añadirramosmodal">
-          Añadir o eliminar ramos
-        </button>
-        {% endif %}
+          <div class="card mb-4 mb-lg-0">
+            <div class="card-body p-0">
+              <div class="card-header text-center">
+                <strong>MIS TRABAJOS</strong>
+                
+                {%if user == request.user%}
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#historialmodal">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+                  </svg>
+                </button>
+
+                {%endif%}
+              </div>
+                <div class="container table-responsive">
+                  <table class="table text-center">
+                    <thead>
+                      <tr>
+                        {% for field in fields %}
+                          <th scope="col">{{ field }}</th>
+                        {% endfor %}
+                        <th>Eliminar</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    {% for his in history %}
+                        <tr>
+                            {% for field in raw_fields %}
+                                <td>{{ his|attr:field }}</td>
+                            {% endfor %}
+                            <td>
+                              {%if user == request.user%}
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="lista_hist">
+                                    <input type="hidden" name="id" value="{{ his.id }}">
+                                    <button class="btn btn-outline-danger" onclick="return confirm('¿Está seguro que desea eliminar?')" type="submit" name="eliminar" >
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
+                                      </svg>
+                                    </button>
+                                </form>
+                              {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+        <br>
         {% endif %}
     </div>
 </div>

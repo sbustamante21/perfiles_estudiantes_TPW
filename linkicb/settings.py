@@ -51,7 +51,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "linkicb.urls"
@@ -79,7 +78,7 @@ WSGI_APPLICATION = "linkicb.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 # Login & Logout URLs
-LOGIN_URL = "/login/"
+LOGIN_URL = "/welcome/"
 LOGIN_REDIRECT_URL = "/main_page/"
 LOGOUT_REDIRECT_URL = "/login/"
 
@@ -140,7 +139,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-USE_DJANGO_JQUERY = True
+# USE_DJANGO_JQUERY = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

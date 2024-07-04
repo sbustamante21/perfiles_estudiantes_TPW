@@ -11,6 +11,7 @@ from xhtml2pdf import pisa
 from django.contrib.auth import views as auth_views
 from django.db.models import Q, Subquery, OuterRef
 from .utils import render_to_pdf, send_custom_email
+from django.core.paginator import Paginator
 from .forms import (
     StudentRegisterForm,
     UserRegisterForm,
@@ -45,8 +46,7 @@ from .models import (
     Contact,
 )
 
-from math import ceil
-from .decorators import role_required
+from .decorators import role_required, anonymous_required
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.forms import PasswordChangeForm
 
@@ -113,7 +113,6 @@ def main_page(request):
             receiver = User.objects.get(id=request.POST.get("id_receiver"))
             message_form = MessageForm(request.POST, user=request.user)
             if message_form.is_valid():
-                # sender_email, receiver, int_type, subj
                 send_custom_email(
                     request.user,
                     receiver,
@@ -121,12 +120,10 @@ def main_page(request):
                     message_form.cleaned_data.get("subject"),
                 )
 
-    nrows = ceil(len(students) / 3)
     context = {
         "search_form": form,
         "students": students,
         "cant": len(students),
-        "nrows": [i for i in range(nrows)],
         "message_form": message_form,
     }
 
@@ -196,7 +193,6 @@ def admin_page(request, modelo=None):
         ],
         "contacto": [
             "id",
-            "message",
             "message_type_id",
             "receiver_id",
             "sender_id",
@@ -230,7 +226,6 @@ def admin_page(request, modelo=None):
         "carrera": ["name"],
         "historial": ["year", "period", "interest_type_id", "subject_id", "student_id"],
         "contacto": [
-            "message",
             "message_type_id",
             "receiver_id",
             "sender_id",
@@ -269,7 +264,7 @@ def admin_page(request, modelo=None):
             id = obj.id
 
         elif "guardar" in request.POST and not "password_form" in request.POST:
-            # form = form_model(request.POST) # Se redeclara el form?
+            #form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
                 form = form_model(request.POST, request.FILES, instance=obj)
@@ -309,11 +304,12 @@ def admin_page(request, modelo=None):
         "id": id,
         "raw_fields": all_field_names,
         "password_form": UserPasswordUpdateFormAdmin(),
+        "model_queue": modelo,
     }
 
     return render(request, "website/admin_page.html", context)
 
-
+@anonymous_required(redirect_url="/main_page/")
 def do_login(request):
     if request.method == "POST":
         form = AuthenticationFormWithInactiveUsersOkay(data=request.POST)
@@ -337,7 +333,7 @@ def do_login(request):
         return render(request, "website/login.html", {"form": form})
 
 
-@role_required([User.PROFESSOR, User.STUDENT])
+@login_required
 def profile_page(request, id_user=None):
     user = User.objects.get(id=id_user)
 
@@ -436,7 +432,7 @@ def profile_page(request, id_user=None):
 
     return render(request, "website/profile_page.html", context)
 
-
+@login_required
 def do_logout(request):
     if request.user.is_authenticated:
         logout(request)
@@ -617,15 +613,16 @@ def student_edit(request):
     )
 
 
-
+@anonymous_required(redirect_url="/main_page/")
 def welcome(request):
     return render(request, "website/welcome.html")
 
 
+@anonymous_required(redirect_url="/main_page/")
 def register(request):
     return render(request, "website/register.html")
 
-
+@anonymous_required(redirect_url="/main_page/")
 def student_register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
@@ -669,7 +666,7 @@ def student_register(request):
         },
     )
 
-
+@anonymous_required(redirect_url="/main_page/")
 def professor_register(request):
     if request.method == "POST":
         user_form = UserRegisterForm(request.POST)

@@ -8,7 +8,6 @@
             <h2>Edición de Estudiante</h2>
             <form method="POST" enctype="multipart/form-data" novalidate class="needs-validation" action={%url 'student_edit'%}>
                 {%csrf_token%}
-                {{student_form.media.js}}
                 {% bootstrap_form user_form %}
                 {% bootstrap_form student_form %}
                 {% buttons %}

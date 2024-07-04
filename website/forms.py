@@ -16,12 +16,14 @@ from django.core.validators import MaxValueValidator
 import datetime
 from .utils import generate_year_choices
 
+
 class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active:
             raise forms.ValidationError(
                 "Cuenta inactiva. Por favor, comuníquese con los administradores: sbustamante21@alumnos.utalca.cl, mlolas19@alumnos.utalca.cl, cecastillo19@alumnos.utalca.cl"
             )
+
 
 class StudentHistory(forms.ModelForm):
     NUMBER_CHOICES = [
@@ -33,9 +35,7 @@ class StudentHistory(forms.ModelForm):
         queryset=InterestType.objects.exclude(name="AUXILIO"), required=True
     )
     year = forms.ChoiceField(
-        choices=generate_year_choices(),
-        required=True,
-        label='Año'
+        choices=generate_year_choices(), required=True, label="Año"
     )
     period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
     student_id = forms.ModelChoiceField(
@@ -62,7 +62,7 @@ class StudentHistory(forms.ModelForm):
             self.fields["student_id"].initial = student_id
 
     def clean_year(self):
-        year = self.cleaned_data.get("year")
+        year = int(self.cleaned_data.get("year"))
 
         if not datetime.datetime.now().year >= year >= 1980:
             raise forms.ValidationError("Year out of bounds")
@@ -89,9 +89,9 @@ class UserRegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Oculta los campos de contraseña si se está editando un usuario existente
-        if kwargs.get('instance'):
-            self.fields.pop('password1')
-            self.fields.pop('password2')
+        if kwargs.get("instance"):
+            self.fields.pop("password1")
+            self.fields.pop("password2")
 
     def clean_username(self):
         username = self.cleaned_data.get("username")
@@ -172,9 +172,7 @@ class UserRegisterFormAdmin(forms.ModelForm):
 
 class StudentRegisterForm(forms.ModelForm):
     admission_year = forms.ChoiceField(
-        choices=generate_year_choices(),
-        required=True,
-        label='Año de Ingreso'
+        choices=generate_year_choices(), required=True, label="Año de Ingreso"
     )
     personal_mail = forms.EmailField(required=False)
     phone_number = forms.IntegerField(required=False)
@@ -340,15 +338,6 @@ class HistoryFormAdmin(forms.ModelForm):
 
 class ContactFormAdmin(forms.ModelForm):
 
-    HELP_CHOICES = [
-        ("option1", "Una ayuda, por favor!"),
-        ("option2", "Necesito ayuda con esto"),
-        ("option3", "Me ayudas?"),
-    ]
-
-    message = forms.ChoiceField(
-        choices=HELP_CHOICES, widget=forms.RadioSelect, required=True
-    )
     message_type_id = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
@@ -359,7 +348,6 @@ class ContactFormAdmin(forms.ModelForm):
     class Meta:
         model = Contact
         fields = [
-            "message",
             "message_type_id",
             "receiver_id",
             "sender_id",
@@ -476,9 +464,7 @@ class SearchForm(forms.Form):
     )
     subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
     admission_year = forms.ChoiceField(
-        choices=generate_year_choices(),
-        required=False,
-        label='Año de Ingreso'
+        choices=generate_year_choices(), required=False, label="Año de Ingreso"
     )
 
 
@@ -487,12 +473,16 @@ class MessageForm(forms.Form):
     interest_type = forms.ModelChoiceField(
         queryset=InterestType.objects.all(), required=True
     )
-    
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
         super(MessageForm, self).__init__(*args, **kwargs)
 
         if user.role == User.PROFESSOR:
-            self.fields["interest_type"].queryset = InterestType.objects.filter(name="AYUDANTIA")
+            self.fields["interest_type"].queryset = InterestType.objects.filter(
+                name="AYUDANTIA"
+            )
         elif user.role == User.STUDENT:
-            self.fields["interest_type"].queryset = InterestType.objects.exclude(name="AYUDANTIA")
+            self.fields["interest_type"].queryset = InterestType.objects.exclude(
+                name="AYUDANTIA"
+            )

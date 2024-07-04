@@ -98,7 +98,6 @@ class History(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
 
 class Contact(models.Model):
-    message = models.CharField(max_length=500, default="SAMPLE MESSAGE")
     message_type_id = models.ForeignKey(InterestType, on_delete=models.CASCADE)
     receiver_id = models.ForeignKey(
         User, related_name="receiver", on_delete=models.CASCADE
@@ -106,5 +105,4 @@ class Contact(models.Model):
     sender_id = models.ForeignKey(
         User, related_name="sender", on_delete=models.CASCADE
     )
-    # Nuevo, el ramo comunicado
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, default="")
