@@ -30,14 +30,14 @@ class StudentHistory(forms.ModelForm):
         (1, "1"),
         (2, "2"),
     ]
-    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True, label="Curso")
     interest_type_id = forms.ModelChoiceField(
-        queryset=InterestType.objects.exclude(name="AUXILIO"), required=True
+        queryset=InterestType.objects.exclude(name="AUXILIO"), required=True, label="Tipo interés"
     )
     year = forms.ChoiceField(
         choices=generate_year_choices(), required=True, label="Año"
     )
-    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
+    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True, label="Semestre")
     student_id = forms.ModelChoiceField(
         queryset=Student.objects.all(),
         required=False,
@@ -70,10 +70,10 @@ class StudentHistory(forms.ModelForm):
 
 
 class UserRegisterForm(UserCreationForm):
-    username = forms.CharField(max_length=30, required=True)
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
+    username = forms.CharField(max_length=30, required=True, label="Nombre de usuario")
+    email = forms.EmailField(required=True, label="Correo institucional")
+    first_name = forms.CharField(max_length=30, required=True, label="Nombre")
+    last_name = forms.CharField(max_length=30, required=True, label="Apellido")
 
     class Meta:
         model = User
@@ -129,10 +129,10 @@ class UserPasswordUpdateFormAdmin(forms.ModelForm):
 
 
 class UserRegisterFormAdmin(forms.ModelForm):
-    username = forms.CharField(max_length=30, required=True)
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=30, required=True)
-    last_name = forms.CharField(max_length=30, required=True)
+    username = forms.CharField(max_length=30, required=True, label="Nombre de usuario")
+    email = forms.EmailField(required=True, label="Correo institucional")
+    first_name = forms.CharField(max_length=30, required=True, label="Nombre")
+    last_name = forms.CharField(max_length=30, required=True, label="Apellido")
     is_active = forms.BooleanField(required=False, initial=True, label="Activo")
     role = forms.ChoiceField(choices=User.ROLE_CHOICES, label="Rol")
 
@@ -174,12 +174,12 @@ class StudentRegisterForm(forms.ModelForm):
     admission_year = forms.ChoiceField(
         choices=generate_year_choices(), required=True, label="Año de Ingreso"
     )
-    personal_mail = forms.EmailField(required=False)
-    phone_number = forms.IntegerField(required=False)
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True,
+    personal_mail = forms.EmailField(required=False, label="Correo personal")
+    phone_number = forms.IntegerField(required=False, label="Número de teléfono")
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera",
     widget=forms.Select(attrs={"hx-get":"../load_cplans", "hx-target":"#id_curriculum_plan_id"}))
     curriculum_plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.none(), required=True
+        queryset=CurriculumPlan.objects.none(), required=True, label="Plan curricular"
     )
 
     class Meta:
@@ -250,7 +250,7 @@ class StudentProfilePicture(forms.ModelForm):
 
 
 class PeriodTypeFormAdmin(forms.ModelForm):
-    name = forms.CharField(required=True)
+    name = forms.CharField(required=True, label="Nombre de tipo de periodo")
 
     class Meta:
         model = PeriodType
@@ -260,9 +260,9 @@ class PeriodTypeFormAdmin(forms.ModelForm):
 
 
 class CurriculumPlanFormAdmin(forms.ModelForm):
-    name = forms.CharField(required=True)
-    impl_year = forms.IntegerField(required=True)
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
+    name = forms.CharField(required=True, label="Nombre del plan curricular")
+    impl_year = forms.IntegerField(required=True, label="Año de implementación")
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera")
 
     class Meta:
         model = CurriculumPlan
@@ -274,7 +274,7 @@ class CurriculumPlanFormAdmin(forms.ModelForm):
 
 
 class InterestTypeFormAdmin(forms.ModelForm):
-    name = forms.CharField(required=True)
+    name = forms.CharField(required=True, label="Nombre del tipo de interés")
 
     class Meta:
         model = InterestType
@@ -284,7 +284,7 @@ class InterestTypeFormAdmin(forms.ModelForm):
 
 
 class DegreeFormAdmin(forms.ModelForm):
-    name = forms.CharField(required=True)
+    name = forms.CharField(required=True, label="Nombre de la carrera")
 
     class Meta:
         model = Degree
@@ -298,13 +298,13 @@ class SubjectFormAdmin(forms.ModelForm):
         (1, "1"),
         (2, "2"),
     ]
-    name = forms.CharField(required=True)
-    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
+    name = forms.CharField(required=True, label="Nombre del curso")
+    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True, label="Período (semestre)")
     period_type = forms.ModelChoiceField(
-        queryset=PeriodType.objects.all(), required=True
+        queryset=PeriodType.objects.all(), required=True, label="Tipo de período"
     )
     plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.all(), required=True
+        queryset=CurriculumPlan.objects.all(), required=True, label="Plan curricular"
     )
 
     class Meta:
@@ -322,13 +322,13 @@ class HistoryFormAdmin(forms.ModelForm):
         (1, "1"),
         (2, "2"),
     ]
-    year = forms.IntegerField(required=True)
-    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True)
+    year = forms.IntegerField(required=True, label="Año")
+    period = forms.ChoiceField(choices=NUMBER_CHOICES, required=True, label="Semestre")
     interest_type_id = forms.ModelChoiceField(
-        queryset=InterestType.objects.all(), required=True
+        queryset=InterestType.objects.all(), required=True, label="Tipo de interés"
     )
-    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
-    student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=True)
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True, label="Curso")
+    student_id = forms.ModelChoiceField(queryset=Student.objects.all(), required=True, label="Correo del estudiante (Identificador)")
 
     class Meta:
         model = History
@@ -344,11 +344,11 @@ class HistoryFormAdmin(forms.ModelForm):
 class ContactFormAdmin(forms.ModelForm):
 
     message_type_id = forms.ModelChoiceField(
-        queryset=InterestType.objects.all(), required=True
+        queryset=InterestType.objects.all(), required=True, label="Tipo de mensaje, según interés"
     )
-    receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True, label="Usuario destinatario")
+    sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True, label="Usuario remitente")
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True, label="Curso")
 
     class Meta:
         model = Contact
@@ -377,17 +377,17 @@ class InterestFormAdmin(forms.ModelForm):
 
 
 class StudentRegisterFormAdmin(forms.ModelForm):
-    admission_year = forms.IntegerField(required=True)
-    personal_mail = forms.EmailField(required=False)
-    phone_number = forms.IntegerField(required=False)
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True,
+    admission_year = forms.IntegerField(required=True, label="Año de ingreso")
+    personal_mail = forms.EmailField(required=False, label="Correo personal")
+    phone_number = forms.IntegerField(required=False, label="Número de teléfono")
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True, label="Carrera"
     widget=forms.Select(attrs={"hx-get":"../../../load_cplans", "hx-target":"#id_curriculum_plan_id"}))
     curriculum_plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.none(), required=True
+        queryset=CurriculumPlan.objects.none(), required=True, label="Plan curricular"
     )
 
-    user = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    pfp = forms.ImageField(required=False)
+    user = forms.ModelChoiceField(queryset=User.objects.all(), required=True, label="Nombre de Usuario")
+    pfp = forms.ImageField(required=False, label="Foto de perfil")
 
     class Meta:
         model = Student
@@ -442,9 +442,9 @@ class StudentRegisterFormAdmin(forms.ModelForm):
 
 
 class StudentInterest(forms.ModelForm):
-    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True, label="Curso")
     interest_type_id = forms.ModelChoiceField(
-        queryset=InterestType.objects.all(), required=True
+        queryset=InterestType.objects.all(), required=True, label="Tipo de interés"
     )
     student_id = forms.ModelChoiceField(
         queryset=Student.objects.all(),
@@ -471,9 +471,9 @@ class StudentInterest(forms.ModelForm):
 class SearchForm(forms.Form):
     name = forms.CharField(max_length=100, required=False, label="Nombre")
     interest_type = forms.ModelChoiceField(
-        queryset=InterestType.objects.all(), required=False
+        queryset=InterestType.objects.all(), required=False, label="Tipo de interés"
     )
-    subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False)
+    subject = forms.ModelChoiceField(queryset=Subject.objects.all(), required=False, label="Curso")
     admission_year = forms.ChoiceField(
         choices=generate_year_choices(), required=False, label="Año de Ingreso"
     )
