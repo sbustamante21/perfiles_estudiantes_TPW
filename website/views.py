@@ -120,8 +120,14 @@ def main_page(request):
                     message_form.cleaned_data.get("subject"),
                 )
 
+    paginator = Paginator(students, 9)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
         "search_form": form,
+        "page_obj": page_obj,
+        "cant_pag": paginator.count,
         "students": students,
         "cant": len(students),
         "message_form": message_form,
@@ -555,8 +561,6 @@ def student_edit(request):
         "email",
         "first_name",
         "last_name",
-        "password1",
-        "password2",
     ]
 
     if request.method == "POST":
@@ -582,8 +586,7 @@ def student_edit(request):
             user.role = User.STUDENT
 
             for field in user_editable_fields:
-                if field != "password1" and field != "password2":
-                    setattr(user, field, user_form.cleaned_data[field])
+                setattr(user, field, user_form.cleaned_data[field])
             user.save()
 
             for field in student_editable_fields:
@@ -769,3 +772,9 @@ def about_us(request):
 
 def custom_404(request, exception):
     return render(request, "custom_404.html", status=404)
+
+def load_cplans(request):
+    degree_id = request.GET.get("degree_id")
+    cplans = CurriculumPlan.objects.filter(degree_id=degree_id)
+
+    return render(request, "website/cplan_options.html", {"cplans":cplans})

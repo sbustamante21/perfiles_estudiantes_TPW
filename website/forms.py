@@ -176,10 +176,11 @@ class StudentRegisterForm(forms.ModelForm):
     )
     personal_mail = forms.EmailField(required=False)
     phone_number = forms.IntegerField(required=False)
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True,
+    widget=forms.Select(attrs={"hx-get":"../load_cplans", "hx-target":"#id_curriculum_plan_id"}))
     curriculum_plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.all(), required=True
+        queryset=CurriculumPlan.objects.none(), required=True
     )
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
 
     class Meta:
         model = Student
@@ -197,6 +198,10 @@ class StudentRegisterForm(forms.ModelForm):
         self.instance = kwargs.get("instance", None)
         self.user = kwargs.pop("user", None)
         super(StudentRegisterForm, self).__init__(*args, **kwargs)
+
+        if "degree_id" in self.data:
+            degree_id = int(self.data.get("degree_id"))
+            self.fields["curriculum_plan_id"].queryset = CurriculumPlan.objects.filter(degree_id=degree_id)
 
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
@@ -375,11 +380,13 @@ class StudentRegisterFormAdmin(forms.ModelForm):
     admission_year = forms.IntegerField(required=True)
     personal_mail = forms.EmailField(required=False)
     phone_number = forms.IntegerField(required=False)
+    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True,
+    widget=forms.Select(attrs={"hx-get":"../../../load_cplans", "hx-target":"#id_curriculum_plan_id"}))
     curriculum_plan_id = forms.ModelChoiceField(
-        queryset=CurriculumPlan.objects.all(), required=True
+        queryset=CurriculumPlan.objects.none(), required=True
     )
+
     user = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=True)
     pfp = forms.ImageField(required=False)
 
     class Meta:
@@ -397,6 +404,10 @@ class StudentRegisterFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get("instance", None)
         super(StudentRegisterFormAdmin, self).__init__(*args, **kwargs)
+
+        if "degree_id" in self.data:
+            degree_id = self.data.get("degree_id")
+            self.fields["curriculum_plan_id"].queryset = CurriculumPlan.objects.filter(degree_id=degree_id)
 
     def clean_admission_year(self):
         admission_year = self.cleaned_data.get("admission_year")
