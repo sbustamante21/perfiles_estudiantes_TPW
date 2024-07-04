@@ -339,11 +339,11 @@ class HistoryFormAdmin(forms.ModelForm):
 class ContactFormAdmin(forms.ModelForm):
 
     message_type_id = forms.ModelChoiceField(
-        queryset=InterestType.objects.all(), required=True
+        queryset=InterestType.objects.all(), required=True, label="Tipo de mensaje, según interés"
     )
-    receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True)
-    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True)
+    receiver_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True, label="Usuario destinatario")
+    sender_id = forms.ModelChoiceField(queryset=User.objects.all(), required=True, label="Usuario remitente")
+    subject_id = forms.ModelChoiceField(queryset=Subject.objects.all(), required=True, label="Curso")
 
     class Meta:
         model = Contact
