@@ -50,6 +50,20 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'admin_page' 'interes' %}"><strong>Interés</strong></a>
                         </li>
+
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{%url 'main_page'%}"><strong>Página Principal</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{%url 'profile_page' request.user.id%}"><strong>Mi Perfil</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{%url 'about_us'%}"><strong>Quiénes somos</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{%url 'logout'%}"><strong>Cerrar sesión</strong></a>
+                        </li>
                       
                     {% endif %}
                     <li class="nav-item">

@@ -96,7 +96,7 @@ class UserRegisterForm(UserCreationForm):
         if kwargs.get("instance"):
             self.fields.pop("password1")
             self.fields.pop("password2")
-    
+
     def clean_first_name(self):
         return self.cleaned_data.get("first_name").lower()
 
@@ -106,9 +106,7 @@ class UserRegisterForm(UserCreationForm):
         if self.instance:
             existing_users = existing_users.exclude(pk=self.instance.pk)
         if existing_users.exists():
-            raise forms.ValidationError(
-                "Este nombre de usuario ya está en uso."
-            )
+            raise forms.ValidationError("Este nombre de usuario ya está en uso.")
         return username
 
     def clean_last_name(self):
@@ -209,7 +207,7 @@ class UserEditFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get("instance", None)
         super(UserEditFormAdmin, self).__init__(*args, **kwargs)
-    
+
     def clean_first_name(self):
         return self.cleaned_data.get("first_name").lower()
 
@@ -235,7 +233,9 @@ class StudentRegisterForm(forms.ModelForm):
         choices=generate_year_choices(), required=True, label="Año de ingreso"
     )
     personal_mail = forms.EmailField(required=False, label="Correo personal (opcional)")
-    phone_number = forms.IntegerField(required=False, label="Número de teléfono (opcional)")
+    phone_number = forms.IntegerField(
+        required=False, label="Número de teléfono (opcional)"
+    )
     degree_id = forms.ModelChoiceField(
         queryset=Degree.objects.all(),
         required=True,
@@ -268,8 +268,8 @@ class StudentRegisterForm(forms.ModelForm):
         if "degree_id" in self.data:
             degree_id = self.data.get("degree_id")
             if degree_id != "":
-                self.fields["curriculum_plan_id"].queryset = CurriculumPlan.objects.filter(
-                    degree_id=degree_id
+                self.fields["curriculum_plan_id"].queryset = (
+                    CurriculumPlan.objects.filter(degree_id=degree_id)
                 )
 
     def clean_admission_year(self):
@@ -300,9 +300,13 @@ class StudentRegisterForm(forms.ModelForm):
                 .exclude(user=self.user)
                 .exists()
             ):
-                raise forms.ValidationError("Este número de teléfono ya está registrado.")
+                raise forms.ValidationError(
+                    "Este número de teléfono ya está registrado."
+                )
             elif len(str(number)) != 9:
-                raise forms.ValidationError("El número de teléfono debe tener 9 dígitos.")
+                raise forms.ValidationError(
+                    "El número de teléfono debe tener 9 dígitos."
+                )
         return number
 
 
@@ -326,7 +330,7 @@ class PeriodTypeFormAdmin(forms.ModelForm):
         fields = [
             "name",
         ]
-    
+
     def clean_name(self):
         name = self.cleaned_data.get("name").upper()
         return name
@@ -360,7 +364,7 @@ class InterestTypeFormAdmin(forms.ModelForm):
         fields = [
             "name",
         ]
-    
+
     def clean_name(self):
         name = self.cleaned_data.get("name").upper()
         return name
@@ -555,9 +559,13 @@ class StudentRegisterFormAdmin(forms.ModelForm):
                 Student.objects.filter(phone_number=number).exists()
                 and self.instance.phone_number != number
             ):
-                raise forms.ValidationError("Este número de teléfono ya está registrado.")
+                raise forms.ValidationError(
+                    "Este número de teléfono ya está registrado."
+                )
             elif len(str(number)) != 9:
-                raise forms.ValidationError("El número de teléfono debe tener 9 dígitos.")
+                raise forms.ValidationError(
+                    "El número de teléfono debe tener 9 dígitos."
+                )
         return number
 
 
@@ -596,11 +604,20 @@ class SearchForm(forms.Form):
         queryset=InterestType.objects.all(), required=False, label="Tipo de interés"
     )
 
-    degree_id = forms.ModelChoiceField(queryset=Degree.objects.all(), required=False, label="Carrera",
-    widget=forms.Select(attrs={"hx-get":"../load_cplans/", "hx-target":  "#id_cplan",}),)
+    degree_id = forms.ModelChoiceField(
+        queryset=Degree.objects.all(),
+        required=False,
+        label="Carrera",
+    )
 
-    cplan = forms.ModelChoiceField(queryset=CurriculumPlan.objects.none(), required=False, label="Plan curricular",
-    widget=forms.Select(attrs={"hx-get":"../load_subjects/", "hx-target": "#id_subject"}),)
+    cplan = forms.ModelChoiceField(
+        queryset=CurriculumPlan.objects.all(),
+        required=False,
+        label="Plan curricular",
+        widget=forms.Select(
+            attrs={"hx-get": "../load_subjects/", "hx-target": "#id_subject"}
+        ),
+    )
 
     subject = forms.ModelChoiceField(
         queryset=Subject.objects.none(), required=False, label="Curso"
@@ -614,17 +631,10 @@ class SearchForm(forms.Form):
         self.instance = kwargs.get("instance", None)
         super(SearchForm, self).__init__(*args, **kwargs)
 
-        if "degree_id" in self.data:
-            degree_id = self.data.get("degree_id")
-            if degree_id != "":
-                self.fields["cplan"].queryset = CurriculumPlan.objects.filter(degree_id=degree_id)
-
         if "cplan" in self.data:
             cplan = self.data.get("cplan")
             if cplan != "":
-                self.fields["subject"].queryset = Subject.objects.filter(
-                        plan_id=cplan
-                    )
+                self.fields["subject"].queryset = Subject.objects.filter(plan_id=cplan)
 
 
 class MessageForm(forms.Form):
