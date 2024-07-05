@@ -45,3 +45,33 @@ def model_translated(model_name):
         return "Ramos"
     elif model_name == "interests":
         return "Intereses"
+
+@register.filter
+def field_translated(field_name):
+
+    trads = {"admission_year": "Año de admisión",
+            "personal_mail": "Correo personal",
+            "phone_numer": "Número de teléfono",
+            "pfp": "Foto de perfil",
+            "user": "Usuario",
+            "degree id": "Carrera",
+            "curriculum plan id": "Plan curricular",
+            "name": "Nombre",
+            "impl_year":"Año",
+            "role": "Role",
+            "year":"Año",
+            "period": "Período",
+            "interest type id": "Tipo de periodo",
+            "subject id": "Ramo",
+            "student id": "Estudiante",
+            "message type id": "Tipo de mensaje",
+            "receiver id": "Destinatario",
+            "sender id": "Emisor",
+            "plan id": "Plan curricular",
+            "ID": "ID",
+            }
+    if not field_name in trads.keys():
+        return field_name.capitalize()
+    
+    return trads[field_name]
+
