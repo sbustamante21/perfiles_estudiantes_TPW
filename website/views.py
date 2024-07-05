@@ -300,8 +300,6 @@ def admin_page(request, modelo=None):
                     form.save()
 
         elif "password_form" in request.POST:
-            print("hola como estan")
-            print(f"HOLA 2: {request.POST.get("id_receiver")}")
             password_form = UserPasswordUpdateFormAdmin(request.POST)
             obj = model.objects.get(id=request.POST.get("id_receiver"))
 

@@ -3,7 +3,8 @@ function setReceiverId(userId) {
 }
 
 function forceAdd() {
-    document.getElementById("editingFlag").value = ""
+    document.getElementById("save_edit_form").reset();
+    document.getElementById("editingFlag").value = "";
 }
 
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
