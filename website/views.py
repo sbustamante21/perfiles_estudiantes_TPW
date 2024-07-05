@@ -78,9 +78,9 @@ def main_page(request):
                     students = Student.objects.filter(admission_year=admission_year)
                 if name:
                     students = students.filter(
-                         Q(user__first_name__icontains=name)
-                         | Q(user__last_name__icontains=name)
-                     )
+                        Q(user__first_name__icontains=name)
+                        | Q(user__last_name__icontains=name)
+                    )
 
                 if degree:
                     degree_obj = Degree.objects.get(name=degree)
@@ -91,11 +91,14 @@ def main_page(request):
                     subj_obj = Subject.objects.filter(plan_id=cur_plan.id)
                     interests_in_plan = Interest.objects.filter(subject_id__in=subj_obj)
 
-                    students = students.filter(id__in=interests_in_plan.values('student_id'))
-                
+                    students = students.filter(
+                        id__in=interests_in_plan.values("student_id")
+                    )
+
                 if subj:
                     interests = Interest.objects.filter(subject_id=subj.id)
-                
+                    students.filter(id__in=Subquery(interests))
+
                 if interest_type:
                     interests = Interest.objects.filter(
                         interest_type_id=interest_type,
@@ -112,7 +115,7 @@ def main_page(request):
                     message_form.cleaned_data.get("interest_type"),
                     message_form.cleaned_data.get("subject"),
                 )
-            return redirect(reverse('main_page'))
+            return redirect(reverse("main_page"))
 
     paginator = Paginator(students, 9)
     page_number = request.GET.get("page")
@@ -406,7 +409,9 @@ def profile_page(request, id_user=None):
                     )
                 if form.is_valid() and not "pfp_estudiante" in request.POST:
                     form.save()
-                    return redirect(reverse("profile_page", kwargs={"id_user": id_user}))
+                    return redirect(
+                        reverse("profile_page", kwargs={"id_user": id_user})
+                    )
                 else:
                     if form.is_valid():
                         if form.cleaned_data.get("pfp") is False:
@@ -795,6 +800,7 @@ def load_cplans(request):
     cplans = CurriculumPlan.objects.filter(degree_id=degree_id)
 
     return render(request, "website/cplan_options.html", {"cplans": cplans})
+
 
 def load_subjects(request):
     cplan_id = request.GET.get("cplan")

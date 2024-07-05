@@ -6,9 +6,17 @@
     <title>Error</title>
 </head>
 <body>
-    <h1>Error al cargar la Página</h1>
-    <p>Lo sentimos, vuelve al inicio.</p>
-    <a href="{% url 'welcome' %}">Volver al inicio</a>
+    <section class="mt-5 pt-5">
+        <div class="px-4 py-5 my-5 text-center">
+            <h1 class="display-5 fw-bold text-body-emphasis">Error al cargar la página</h1>
+            <div class="col-lg-6 mx-auto">
+              <p class="lead mb-4">Lo sentimos, vuelve al inicio.</p>
+              <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{% url 'welcome' %}">Volver al inicio</a>
+              </div>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
 {% bootstrap_css %}

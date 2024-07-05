@@ -42,8 +42,8 @@
                                 </a>
                             {% endif %}
                             <h4>
-                                {{student.user.first_name}}
-                                {{student.user.last_name}}
+                                {{student.user.first_name|parse_name}}
+                                {{student.user.last_name|parse_name}}
                                 {% if student.user != request.user %}
                                     <button type="button" onclick="setReceiverId('{{ student.user.id }}')" data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-success ms-1">Contactar
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-fill" viewBox="0 0 16 16">
