@@ -43,7 +43,7 @@
                                 </button>
                             </form>
                             {% if model_name == "usuarios" %}
-                                <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#password_modal" class="btn btn-primary ms-1 mx-1">Cambiar contraseña</button>
+                                <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#password_modal" class="btn btn-success ms-1 mx-1">Cambiar contraseña</button>
                             {% endif %}
                             {% if obj != request.user %}
                                 <form method="post" style="display:inline;">
@@ -92,9 +92,9 @@
                         <input type="hidden" name="id" value="{{ id }}">
                         {% buttons %}
                             {% if editing == True %}
-                                <button class="btn btn-primary" type="submit" name="guardar">Actualizar</button>
+                                <button class="btn btn-success" type="submit" name="guardar">Actualizar</button>
                             {% else %}
-                                <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                                <button class="btn btn-success" type="submit" name="guardar">Guardar</button>
                             {% endif %}
                             <button type="button" 
                             class="btn btn-secondary" 
@@ -104,9 +104,6 @@
                         {% endbuttons %}
                     </form>
                 </div>
-                <script>
-                    $('id_form') buscar input -> 
-                </script>
             </div>
         </div>
 </div>
@@ -137,7 +134,7 @@
                     <input type="hidden" name="password_form">
                     <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
                     {% buttons %}
-                      <button class="btn btn-primary" type="submit" name="guardar">Cambiar contraseña</button>
+                      <button class="btn btn-success" type="submit" name="guardar">Cambiar contraseña</button>
                       <button type="button" 
                             class="btn btn-secondary" 
                             data-bs-dismiss="modal">

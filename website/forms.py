@@ -69,7 +69,7 @@ class StudentHistory(forms.ModelForm):
         year = int(self.cleaned_data.get("year"))
 
         if not datetime.datetime.now().year >= year >= 1980:
-            raise forms.ValidationError("Year out of bounds")
+            raise forms.ValidationError("Año no disponible.")
         return year
 
 
@@ -104,7 +104,7 @@ class UserRegisterForm(UserCreationForm):
             existing_users = existing_users.exclude(pk=self.instance.pk)
         if existing_users.exists():
             raise forms.ValidationError(
-                "This username is already used by another user."
+                "Este nombre de usuario ya existe, escoja otro."
             )
         return username
 
@@ -116,7 +116,7 @@ class UserRegisterForm(UserCreationForm):
             # Exclude the current instance from the existing users
             existing_users = existing_users.exclude(pk=self.instance.pk)
         if existing_users.exists():
-            raise forms.ValidationError("Ya se está usando este correo.")
+            raise forms.ValidationError("Este correo ya está registrado.")
 
         return email
 
@@ -160,7 +160,7 @@ class UserRegisterFormAdmin(forms.ModelForm):
         email = self.cleaned_data.get("email")
 
         if User.objects.filter(email=email).exists() and self.instance.email != email:
-            raise forms.ValidationError("This value already exists.")
+            raise forms.ValidationError("Este correo ya está registrado.")
         return email
 
     def save(self, commit=True):
@@ -202,7 +202,7 @@ class UserEditFormAdmin(forms.ModelForm):
         email = self.cleaned_data.get("email")
 
         if User.objects.filter(email=email).exists() and self.instance.email != email:
-            raise forms.ValidationError("This value already exists.")
+            raise forms.ValidationError("Este correo ya está registrado.")
         return email
 
     def save(self, commit=True):
@@ -214,10 +214,10 @@ class UserEditFormAdmin(forms.ModelForm):
 
 class StudentRegisterForm(forms.ModelForm):
     admission_year = forms.ChoiceField(
-        choices=generate_year_choices(), required=True, label="Año de Ingreso"
+        choices=generate_year_choices(), required=True, label="Año de ingreso"
     )
-    personal_mail = forms.EmailField(required=False, label="Correo personal")
-    phone_number = forms.IntegerField(required=False, label="Número de teléfono")
+    personal_mail = forms.EmailField(required=False, label="Correo personal (opcional)")
+    phone_number = forms.IntegerField(required=False, label="Número de teléfono (opcional)")
     degree_id = forms.ModelChoiceField(
         queryset=Degree.objects.all(),
         required=True,
@@ -257,7 +257,7 @@ class StudentRegisterForm(forms.ModelForm):
         admission_year = self.cleaned_data.get("admission_year")
 
         if not datetime.datetime.now().year >= int(admission_year) >= 1980:
-            raise forms.ValidationError("Year out of bounds")
+            raise forms.ValidationError("Año no disponible.")
         return admission_year
 
     def clean_personal_mail(self):
@@ -269,7 +269,7 @@ class StudentRegisterForm(forms.ModelForm):
                 .exclude(user=self.user)
                 .exists()
             ):
-                raise forms.ValidationError("This email is already used")
+                raise forms.ValidationError("Este correo ya está registrado.")
         return email
 
     def clean_phone_number(self):
@@ -281,9 +281,9 @@ class StudentRegisterForm(forms.ModelForm):
                 .exclude(user=self.user)
                 .exists()
             ):
-                raise forms.ValidationError("This phone number is already used")
+                raise forms.ValidationError("Este número de teléfono ya está registrado.")
             elif len(str(number)) != 9:
-                raise forms.ValidationError("The phone number must be 9 digits long")
+                raise forms.ValidationError("El número de teléfono debe tener 9 dígitos.")
         return number
 
 
@@ -300,7 +300,7 @@ class StudentProfilePicture(forms.ModelForm):
 
 
 class PeriodTypeFormAdmin(forms.ModelForm):
-    name = forms.CharField(required=True, label="Nombre de tipo de periodo")
+    name = forms.CharField(required=True, label="Nombre del tipo de período")
 
     class Meta:
         model = PeriodType
@@ -464,7 +464,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
     )
 
     user = forms.ModelChoiceField(
-        queryset=User.objects.all(), required=True, label="Nombre de Usuario"
+        queryset=User.objects.all(), required=True, label="Nombre de usuario"
     )
     pfp = forms.ImageField(required=False, label="Foto de perfil")
 
@@ -494,7 +494,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
         admission_year = self.cleaned_data.get("admission_year")
 
         if not datetime.datetime.now().year >= admission_year >= 1980:
-            raise forms.ValidationError("Year out of bounds")
+            raise forms.ValidationError("Año no disponible.")
         return admission_year
 
     def clean_personal_mail(self):
@@ -505,7 +505,7 @@ class StudentRegisterFormAdmin(forms.ModelForm):
                 Student.objects.filter(personal_mail=email).exists()
                 and self.instance.personal_mail != email
             ):
-                raise forms.ValidationError("This email is already used")
+                raise forms.ValidationError("Este correo ya está registrado.")
         return email
 
     def clean_phone_number(self):
@@ -516,9 +516,9 @@ class StudentRegisterFormAdmin(forms.ModelForm):
                 Student.objects.filter(phone_number=number).exists()
                 and self.instance.phone_number != number
             ):
-                raise forms.ValidationError("This phone number is already used")
+                raise forms.ValidationError("Este número de teléfono ya está registrado.")
             elif len(str(number)) != 9:
-                raise forms.ValidationError("The phone number must be 9 digits long")
+                raise forms.ValidationError("El número de teléfono debe tener 9 dígitos.")
         return number
 
 
@@ -560,7 +560,7 @@ class SearchForm(forms.Form):
         queryset=Subject.objects.all(), required=False, label="Curso"
     )
     admission_year = forms.ChoiceField(
-        choices=generate_year_choices(), required=False, label="Año de Ingreso"
+        choices=generate_year_choices(), required=False, label="Año de ingreso"
     )
 
 
@@ -569,7 +569,7 @@ class MessageForm(forms.Form):
         queryset=Subject.objects.all(), required=True, label="Ramo"
     )
     interest_type = forms.ModelChoiceField(
-        queryset=InterestType.objects.all(), required=True, label="Tipo de Interés"
+        queryset=InterestType.objects.all(), required=True, label="Tipo de interés"
     )
 
     def __init__(self, *args, **kwargs):

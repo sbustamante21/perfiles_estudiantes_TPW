@@ -66,10 +66,10 @@
                                 {% if request.user.role != user.ADMIN %}
                                     <li><a class="dropdown-item" href="{%url 'profile_page' request.user.id%}">Mi perfil</a></li>
                                 {% endif %}
-                                <li><a class="dropdown-item" href="{%url 'main_page'%}">Página Principal</a></li>
+                                <li><a class="dropdown-item" href="{%url 'main_page'%}">Página principal</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{%url 'about_us'%}">Quiénes Somos</a></li>
-                                <li><a class="dropdown-item" href="{%url 'logout'%}">Cerrar Sesión</a></li>
+                                <li><a class="dropdown-item" href="{%url 'about_us'%}">Quiénes somos</a></li>
+                                <li><a class="dropdown-item" href="{%url 'logout'%}">Cerrar sesión</a></li>
                             </ul>
                         </div>
                     </li>
