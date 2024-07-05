@@ -5,90 +5,19 @@
 
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" />
 
-<div class="container mt-5 pt-5">
-    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name|model_translated }} <br>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#save_edit_modal" onclick="forceAdd()">
-            Añadir
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-            </svg>
-        </button>
-    </h2>
-    <div class="table-responsive">
-        <table class="table" id="data_table">
-            <thead>
-                <tr>
-                    {% for field in model_fields %}
-                        <th scope="col">{{ field }}</th>
-                    {% endfor %}
-                     <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for obj in objs %}
-                    <tr>
-                        {% for field in raw_fields %}
-                            <td>{{ obj|attr:field|display_role:field }}</td>
-                        {% endfor %}
-                        <td>
-                            <div class="btn-group" role="group">
-                            <form method="post" style="display:inline;" id="edit_form">
-                                {% csrf_token %}
-                                <input type="hidden" name="id" value="{{ obj.id }}">
-                                <button class = "btn btn-warning mx-1" type="submit" name="editar" data-bs-toggle="modal" data-bs-target="#save_edit_modal">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-                                    </svg>
-                                </button>
-                            </form>
-                            {% if model_name == "usuarios" %}
-                                <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-mdb-button-init data-mdb-ripple-init data-bs-toggle="modal" data-bs-target="#password_modal" class="btn btn-success ms-1 mx-1">Cambiar contraseña</button>
-                            {% endif %}
-                            {% if obj != request.user %}
-                                <form method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="id" value="{{ obj.id }}">
-                                    <button class="btn btn-danger" onclick="return confirm('¿Seguro que desea eliminar?')" type="submit" name="eliminar">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                                            </svg>
-                                    </button>
-                                </form>
-                            {% endif %}
-                        </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="modal fade" 
-         id="save_edit_modal" 
-         tabindex="-1" 
-         aria-labelledby="exampleModalLabel" 
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" 
-                        id="exampleModalLabel">
-                        {{model_name|model_translated}}
-                    </h5>
-                    <button type="button" 
-                            class="btn-close" 
-                            data-bs-dismiss="modal" 
-                            aria-label="Close">
-
-                    </button>
+<div class="container-fluid">
+    <h2 class="mt-5 pt-5">Administración para datos de {{ model_name|model_translated }}</h2>
+    <div class="row pt-2">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    Añadir/Editar
                 </div>
-                <div class="modal-body">
+                <div class="card-body">
                     <form method="POST" enctype="multipart/form-data" id="save_edit_form">
                         {% csrf_token %}
                         {% bootstrap_form form %}
-                        <input type="hidden" name="editing" id="editingFlag" value="{{ editing }}">
+                        <input type="hidden" name="editing" value="{{ editing }}">
                         <input type="hidden" name="id" value="{{ id }}">
                         {% buttons %}
                             {% if editing == True %}
@@ -96,16 +25,75 @@
                             {% else %}
                                 <button class="btn btn-success" type="submit" name="guardar">Guardar</button>
                             {% endif %}
-                            <button type="button" 
-                            class="btn btn-secondary" 
-                            data-bs-dismiss="modal">
-                                Cerrar
-                            </button>
                         {% endbuttons %}
                     </form>
                 </div>
             </div>
         </div>
+        <div class="col-md-9">
+            <div class="container">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped" id="data_table">
+                        <thead>
+                            <tr>
+                                {% for field in model_fields %}
+                                <th scope="col">{{ field|field_translated }}</th>
+                                {% endfor %}
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in objs %}
+                            <tr>
+                                {% for field in raw_fields %}
+                                <td>{{ obj|attr:field|display_role:field }}</td>
+                                {% endfor %}
+                                <td>
+                                    <div class="dropdown d-inline-block">
+                                        <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle text-black" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-gear-fill" viewBox="0 0 16 16">
+                                                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                                              </svg>
+                                        </a>
+                                        <ul class="dropdown-menu text-small shadow">
+                                            <li>
+                                                <form method="POST" style="display:inline;" id="edit_form">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="id" value="{{ obj.id }}">
+                                                    <button class="dropdown-item" type="submit" name="editar">
+                                                        Editar
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                {% if model_name == "usuarios" %}
+                                                <button type="button" onclick="setReceiverId('{{ obj.id }}')" data-bs-toggle="modal" data-bs-target="#password_modal" class="dropdown-item">
+                                                    Cambiar contraseña
+                                                </button>
+                                                {% endif %}
+                                            </li>
+                                            <li>
+                                                {% if obj != request.user %}
+                                                    <form method="post" style="display:inline;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="id" value="{{ obj.id }}">
+                                                        <button class="dropdown-item" onclick="return confirm('Are you sure you want to delete?')" type="submit" name="eliminar">
+                                                            Borrar
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            </li>
+                                        </ul>
+                                      </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" 
@@ -124,7 +112,6 @@
                             class="btn-close" 
                             data-bs-dismiss="modal" 
                             aria-label="Close">
-
                     </button>
                 </div>
                 <div class="modal-body">
@@ -136,13 +123,13 @@
                     {% buttons %}
                       <button class="btn btn-success" type="submit" name="guardar">Cambiar contraseña</button>
                       <button type="button" 
-                            class="btn btn-secondary" 
-                            data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
+                              class="btn btn-secondary" 
+                              data-bs-dismiss="modal">
+                          Cerrar
+                      </button>
                     {% endbuttons %}
                   </form>
-                </div>
+              </div>
             </div>
         </div>
 </div>
