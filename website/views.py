@@ -32,6 +32,7 @@ from .forms import (
     SearchForm,
     MessageForm,
     UserPasswordUpdateFormAdmin,
+    UserEditFormAdmin,
 )
 from .models import (
     Student,
@@ -70,44 +71,36 @@ def main_page(request):
                 subj = form.cleaned_data.get("subject")
                 interest_type = form.cleaned_data.get("interest_type")
                 admission_year = form.cleaned_data.get("admission_year")
+                cplan = form.cleaned_data.get("cplan")
+                degree = form.cleaned_data.get("degree_id")
 
                 if admission_year:
                     students = Student.objects.filter(admission_year=admission_year)
-
-                # Se completa nombre pero no intereses
-                if name and not interest_type and not subj:
+                if name:
                     students = students.filter(
-                        Q(user__first_name__icontains=name)
-                        | Q(user__last_name__icontains=name)
-                    )
+                         Q(user__first_name__icontains=name)
+                         | Q(user__last_name__icontains=name)
+                     )
 
-                # Se completan solo intereses pero no nombres
-                elif not name and interest_type and subj:
-                    interests = Interest.objects.filter(
-                        interest_type_id=interest_type, subject_id=subj
-                    ).values("student_id")
-                    students = students.filter(id__in=Subquery(interests))
+                if degree:
+                    degree_obj = Degree.objects.get(name=degree)
+                    students = students.filter(degree_id=degree_obj.id)
 
-                # Se completa solo el interes
-                elif not name and not subj and interest_type:
+                if cplan:
+                    cur_plan = CurriculumPlan.objects.get(name=cplan.name)
+                    subj_obj = Subject.objects.filter(plan_id=cur_plan.id)
+                    interests_in_plan = Interest.objects.filter(subject_id__in=subj_obj)
+
+                    students = students.filter(id__in=interests_in_plan.values('student_id'))
+                
+                if subj:
+                    interests = Interest.objects.filter(subject_id=subj.id)
+                
+                if interest_type:
                     interests = Interest.objects.filter(
                         interest_type_id=interest_type,
                     ).values("student_id")
                     students = students.filter(id__in=Subquery(interests))
-
-                # Se completa nombre e intereses
-                elif name and interest_type and subj:
-                    interests = Interest.objects.filter(
-                        interest_type=interest_type, subject=subj
-                    ).values("student_id")
-
-                    students = students.filter(
-                        (
-                            Q(user__first_name__icontains=name)
-                            | Q(user__last_name__icontains=name)
-                        )
-                        & Q(id__in=Subquery(interests))
-                    )
 
         elif "message_form" in request.POST:
             receiver = User.objects.get(id=request.POST.get("id_receiver"))
@@ -119,6 +112,7 @@ def main_page(request):
                     message_form.cleaned_data.get("interest_type"),
                     message_form.cleaned_data.get("subject"),
                 )
+            return redirect(reverse('main_page'))
 
     paginator = Paginator(students, 9)
     page_number = request.GET.get("page")
@@ -262,18 +256,25 @@ def admin_page(request, modelo=None):
 
         if "eliminar" in request.POST:
             model.objects.get(id=request.POST.get("id")).delete()
+            return redirect(reverse("admin_page", kwargs={"modelo": modelo}))
 
         elif "editar" in request.POST:
             obj = model.objects.get(id=request.POST.get("id"))
-            form = form_model(instance=obj)
+
+            if modelo == "usuario":
+                form = UserEditFormAdmin(instance=obj)
+            else:
+                form = form_model(instance=obj)
             editing = True
             id = obj.id
 
         elif "guardar" in request.POST and not "password_form" in request.POST:
-            #form = form_model(request.POST) # Se redeclara el form?
             if request.POST.get("editing") == "True":
                 obj = model.objects.get(id=request.POST.get("id"))
-                form = form_model(request.POST, request.FILES, instance=obj)
+                if modelo == "usuario":
+                    form = UserEditFormAdmin(request.POST, request.FILES, instance=obj)
+                else:
+                    form = form_model(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     for field in editable_fields[modelo]:
                         if field != "pfp":
@@ -286,19 +287,22 @@ def admin_page(request, modelo=None):
                     obj.save()
                     editing = False
                     form = form_model()
+                    return redirect(reverse("admin_page", kwargs={"modelo": modelo}))
             else:
                 form = form_model(request.POST, request.FILES)
                 if form.is_valid():
                     form.save()
+                return redirect(reverse("admin_page", kwargs={"modelo": modelo}))
 
         elif "password_form" in request.POST:
             password_form = UserPasswordUpdateFormAdmin(request.POST)
             obj = model.objects.get(id=request.POST.get("id_receiver"))
+
             if password_form.is_valid():
                 obj.set_password(password_form.cleaned_data["password"])
                 obj.save()
             password_form = UserPasswordUpdateFormAdmin()
-                
+            return redirect(reverse("admin_page", kwargs={"modelo": modelo}))
 
     context = {
         "model": model,
@@ -314,6 +318,7 @@ def admin_page(request, modelo=None):
     }
 
     return render(request, "website/admin_page.html", context)
+
 
 @anonymous_required(redirect_url="/main_page/")
 def do_login(request):
@@ -385,9 +390,11 @@ def profile_page(request, id_user=None):
                         message_form.cleaned_data.get("interest_type"),
                         message_form.cleaned_data.get("subject"),
                     )
+                return redirect(reverse("profile_page", kwargs={"id_user": id_user}))
 
             if "eliminar" in request.POST:
                 model.objects.get(id=request.POST.get("id")).delete()
+                return redirect(reverse("profile_page", kwargs={"id_user": id_user}))
             if "guardar" in request.POST:
                 if "lista_hist" in request.POST:
                     form = StudentHistory(request.POST, student_id=user.student)
@@ -399,7 +406,7 @@ def profile_page(request, id_user=None):
                     )
                 if form.is_valid() and not "pfp_estudiante" in request.POST:
                     form.save()
-                    # form = model(student_id=user.student) # ????
+                    return redirect(reverse("profile_page", kwargs={"id_user": id_user}))
                 else:
                     if form.is_valid():
                         if form.cleaned_data.get("pfp") is False:
@@ -437,6 +444,7 @@ def profile_page(request, id_user=None):
         context = {"user": user, "role": "Docente"}
 
     return render(request, "website/profile_page.html", context)
+
 
 @login_required
 def do_logout(request):
@@ -528,20 +536,24 @@ def professor_edit(request):
         },
     )
 
+
 def change_password(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Actualiza la sesión del usuario si la contraseña ha cambiado
-            messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
-            return redirect(reverse(f"profile_page", kwargs={"id_user": user.id}))  # Redirige a la página de perfil
-        else:
-            messages.error(request, 'Por favor corrige los errores indicados.')
+            update_session_auth_hash(
+                request, user
+            )  # Actualiza la sesión del usuario si la contraseña ha cambiado
+            messages.success(request, "Tu contraseña ha sido cambiada correctamente.")
+            return redirect(
+                reverse(f"profile_page", kwargs={"id_user": user.id})
+            )  # Redirige a la página de perfil
     else:
         form = PasswordChangeForm(request.user)
-    
-    return render(request, 'website/change_password.html', {'form': form})
+
+    return render(request, "website/change_password.html", {"form": form})
+
 
 def student_edit(request):
 
@@ -625,6 +637,7 @@ def welcome(request):
 def register(request):
     return render(request, "website/register.html")
 
+
 @anonymous_required(redirect_url="/main_page/")
 def student_register(request):
     if request.method == "POST":
@@ -668,6 +681,7 @@ def student_register(request):
             "student_form": student_form,
         },
     )
+
 
 @anonymous_required(redirect_url="/main_page/")
 def professor_register(request):
@@ -767,14 +781,23 @@ def generate_pdf(request, id_user=None):
         return response
     return HttpResponse("Error generating PDF")
 
+
 def about_us(request):
-    return render(request, 'website/about_us.html')
+    return render(request, "website/about_us.html")
+
 
 def custom_404(request, exception):
     return render(request, "custom_404.html", status=404)
+
 
 def load_cplans(request):
     degree_id = request.GET.get("degree_id")
     cplans = CurriculumPlan.objects.filter(degree_id=degree_id)
 
-    return render(request, "website/cplan_options.html", {"cplans":cplans})
+    return render(request, "website/cplan_options.html", {"cplans": cplans})
+
+def load_subjects(request):
+    cplan_id = request.GET.get("cplan")
+    subjects = Subject.objects.filter(plan_id=cplan_id)
+
+    return render(request, "website/subject_options.html", {"subjects": subjects})

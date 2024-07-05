@@ -5,7 +5,9 @@
 
 
 <div class="container mt-5 pt-5">
+    {% if user == request.user %}
     <h3>Hola, {{user.username}}! Has iniciado sesión como {{role}}</h1>
+    {%endif%}
 </div>
 
 <section style="background-color: #eee;">
@@ -197,25 +199,25 @@
                 </div>
               </div>
               {% if role == "Estudiante" %}
-                {% if user.personal_mail %}
+                {% if user.student.personal_mail %}
                 <hr>
                 <div class="row">
                   <div class="col-sm-3">
                     <p class="mb-0">Correo Personal</p>
                   </div>
                   <div class="col-sm-9">
-                    <p class="text-muted mb-0">{{user.personal_mail}}</p>
+                    <p class="text-muted mb-0">{{user.student.personal_mail}}</p>
                   </div>
                 </div>
                 {% endif %}
-                {% if user.phone_number %}
+                {% if user.student.phone_number %}
                 <hr>
                 <div class="row">
                   <div class="col-sm-3">
                     <p class="mb-0">Celular</p>
                   </div>
                   <div class="col-sm-9">
-                    <p class="text-muted mb-0">{{user.phone_number}}</p>
+                    <p class="text-muted mb-0">{{user.student.phone_number}}</p>
                   </div>
                 </div>
                 {% endif %}
@@ -273,7 +275,9 @@
                         {% for field in fields %}
                           <th scope="col">{{ field }}</th>
                         {% endfor %}
+                        {% if user == request.user %}
                         <th>Eliminar</th>
+                        {% endif %}
                       </tr>
                   </thead>
                   <tbody>
@@ -355,13 +359,11 @@
           {% bootstrap_form form_interest %}
           {% buttons %}
             <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Cerrar
+            </button>
           {% endbuttons %}
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cerrar
-        </button>
       </div>
     </div>
   </div>
@@ -383,13 +385,11 @@
             {% bootstrap_form pfp_form %}
             {% buttons %}
           <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
           {% endbuttons %}
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cerrar
-        </button>
       </div>
     </div>
   </div>
@@ -425,15 +425,13 @@
                     <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="{{ user.id }}">
                     {% buttons %}
                       <button class="btn btn-primary" type="submit" name="guardar">Enviar</button>
-                    {% endbuttons %}
-                  </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" 
+                      <button type="button" 
                             class="btn btn-secondary" 
                             data-bs-dismiss="modal">
                         Cerrar
                     </button>
+                    {% endbuttons %}
+                  </form>
                 </div>
             </div>
         </div>
