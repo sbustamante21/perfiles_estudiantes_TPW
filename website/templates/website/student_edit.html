@@ -5,14 +5,14 @@
 <div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h2>Edición de Estudiante</h2>
+            <h2 class="text-center">Editar perfil</h2>
             <form method="POST" enctype="multipart/form-data" novalidate class="needs-validation" action={%url 'student_edit'%}>
                 {%csrf_token%}
                 {% bootstrap_form user_form %}
                 {% bootstrap_form student_form %}
                 {% buttons %}
-                <button type="submit" class="btn btn-primary">
-                Actualizar Perfil
+                <button type="submit" class="btn btn-success">
+                Actualizar perfil
                 </button>
                 {% endbuttons %}
             </form>

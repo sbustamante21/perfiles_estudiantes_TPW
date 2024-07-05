@@ -8,7 +8,7 @@
     <div class="col col-lg-4 col-md-12 col-sm-12 col-12 px-0 mt-1">
       <div class="card">
         <div class="card-header">
-          <h4>Búsqueda</h4>
+          <h4 class="text-center">Búsqueda</h4>
         </div>
         <div class="card-body">
           <form method="POST" enctype="multipart/form-data">
@@ -16,7 +16,7 @@
             {% bootstrap_form search_form %}
             <input type="hidden" name="search_form">
             {% buttons %}
-              <button class="btn btn-primary" type="submit">Buscar</button>
+              <button class="btn btn-success" type="submit">Buscar</button>
               <button class="btn btn-secondary" type="reset">Limpiar</button>
             {% endbuttons %}
           </form>
@@ -31,16 +31,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                     <div class="card">
                         <div class="card-body text-center">
-                            <h4>
-                                {{student.user.username}}
-                                {% if student.user != request.user %}
-                                    <button type="button" onclick="setReceiverId('{{ student.user.id }}')" data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-primary ms-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-fill" viewBox="0 0 16 16">
-                                            <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"></path>
-                                        </svg>
-                                    </button>
-                                {% endif %}
-                            </h4>
+                            
                             {% if student.pfp %}
                                 <a href="{% url 'profile_page' student.user.id %}">
                                     <img src="{{ student.pfp.url }}" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 150px;">
@@ -50,6 +41,17 @@
                                     <img src="https://cdn-icons-png.flaticon.com/128/456/456283.png" alt="Default Avatar" class="rounded-circle img-fluid" style="width: 150px;">
                                 </a>
                             {% endif %}
+                            <h4>
+                                {{student.user.first_name}}
+                                {{student.user.last_name}}
+                                {% if student.user != request.user %}
+                                    <button type="button" onclick="setReceiverId('{{ student.user.id }}')" data-bs-toggle="modal" data-bs-target="#contactmodal" class="btn btn-outline-success ms-1">Contactar
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-fill" viewBox="0 0 16 16">
+                                            <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"></path>
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </h4>
                         </div>
                     </div>
                 </div>
@@ -107,9 +109,9 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" 
+                    <h5 class="modal-title text-center" 
                         id="exampleModalLabel">
-                        Contacto
+                        CONTACTAR USUARIO
                     </h5>
                     <button type="button" 
                             class="btn-close" 
@@ -125,7 +127,7 @@
                     <input type="hidden" name="message_form">
                     <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
                     {% buttons %}
-                      <button class="btn btn-primary" type="submit" name="guardar">Enviar</button>
+                      <button class="btn btn-success" type="submit" name="guardar">Enviar</button>
                       <button type="button" 
                             class="btn btn-secondary" 
                             data-bs-dismiss="modal">

@@ -428,7 +428,7 @@ def profile_page(request, id_user=None):
             "pfp": pfp,
             "cplan": cplan,
             "history": student_history,
-            "fields": ["año", "periodo", "ramo", "tipo"],
+            "fields": ["AÑO", "PERIODO", "RAMO", "TIPO"],
             "raw_fields": ["year", "period", "subject_id", "interest_type_id"],
             "form_history": StudentHistory(student_id=user.student),
             "help_list": student_help,

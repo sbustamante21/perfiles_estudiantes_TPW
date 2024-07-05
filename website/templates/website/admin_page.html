@@ -21,9 +21,9 @@
                         <input type="hidden" name="id" value="{{ id }}">
                         {% buttons %}
                             {% if editing == True %}
-                                <button class="btn btn-primary" type="submit" name="guardar">Actualizar</button>
+                                <button class="btn btn-success" type="submit" name="guardar">Actualizar</button>
                             {% else %}
-                                <button class="btn btn-primary" type="submit" name="guardar">Guardar</button>
+                                <button class="btn btn-success" type="submit" name="guardar">Guardar</button>
                             {% endif %}
                         {% endbuttons %}
                     </form>
@@ -121,17 +121,15 @@
                     <input type="hidden" name="password_form">
                     <input type="hidden" name="id_receiver" id ="receiver_in_modal" value="">
                     {% buttons %}
-                      <button class="btn btn-primary" type="submit" name="guardar">Cambiar contraseña</button>
+                      <button class="btn btn-success" type="submit" name="guardar">Cambiar contraseña</button>
+                      <button type="button" 
+                              class="btn btn-secondary" 
+                              data-bs-dismiss="modal">
+                          Cerrar
+                      </button>
                     {% endbuttons %}
                   </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" 
-                            class="btn btn-secondary" 
-                            data-bs-dismiss="modal">
-                        Cerrar
-                    </button>
-                </div>
+              </div>
             </div>
         </div>
 </div>
