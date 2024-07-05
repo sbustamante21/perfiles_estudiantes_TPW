@@ -2,18 +2,23 @@
 {% load bootstrap5 %}
 {% block content %}
 
-  <div class="container mt-5 pt-5">
-    <form method="POST" action="{% url 'login' %}">
-      {% csrf_token %}  
-      {% bootstrap_form form %}
-      {% buttons %}
-      <button type="submit" class="btn btn-success">
-        Ingresar
-      </button>
-      <a href="{% url 'password_reset' %}">Resetear la contraseña</a>
-      {% endbuttons %}
-    </form>
+<div class="container align-items-center justify-content-center mt-5 pt-5">
+  <div class="row justify-content-center w-100">
+    <div class="col-md-6 col-lg-4">
+      <h2><strong>Inicio de Sesión</strong></h2>
+      <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}  
+        {% bootstrap_form form %}
+        {% buttons %}
+        <button type="submit" class="btn btn-success">
+          Ingresar
+        </button>
+        <a href="{% url 'password_reset' %}">Resetear la contraseña</a>
+        {% endbuttons %}
+      </form>
+    </div>
   </div>
+</div>
 
 {% bootstrap_css %}
 {% bootstrap_javascript %}
